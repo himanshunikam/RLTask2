@@ -126,4 +126,4 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
 
 
 if __name__ == "__main__":
-    train(seed=7, verbose=True)
+    train(seed=119, verbose=True)
