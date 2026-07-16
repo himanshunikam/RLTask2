@@ -15,7 +15,7 @@ import optuna
 from actor_critic import train
 
 # ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [100, 101]     # DISJOINT from eval seeds 0-9
+TUNE_SEEDS   = [115, 119]     # DISJOINT from eval seeds 0-9; easiest of 100-119 (random reaches goal)
 MAX_EPISODES = 1500           # per-seed episode budget per trial
 N_TRIALS     = 10
 
@@ -31,7 +31,6 @@ def objective(trial):
         actor_lr           = trial.suggest_float("actor_lr", 1e-5, 1e-3, log=True),
         critic_lr          = trial.suggest_float("critic_lr", 1e-4, 3e-3, log=True),
         gamma              = trial.suggest_float("gamma", 0.95, 0.999),
-        n_step             = trial.suggest_int("n_step", 1, 5),
         noise_std          = trial.suggest_float("noise_std", 0.05, 0.4),
         epsilon_min        = trial.suggest_float("epsilon_min", 0.05, 0.3),
         epsilon_decay      = trial.suggest_float("epsilon_decay", 0.99, 0.9999),

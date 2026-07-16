@@ -83,14 +83,14 @@ def act(s, actor, buffer, epsilon, noise_std, warmup):
 
 
 def learn(batch, steps, actor, critic, actor_target, critic_target,
-          actor_opt, critic_opt, gamma, n_step, target_update_freq):
+          actor_opt, critic_opt, gamma, target_update_freq):
     states, actions, rewards, next_states, dones = batch
 
-    # --- critic update: regress Q(s,a) toward n-step return + gamma^n * Q'(s', mu'(s')) ---
+    # --- critic update: 1-step TD target r + gamma * Q'(s', mu'(s'))  (n-step removed) ---
     with torch.no_grad():
         next_actions = actor_target(next_states)
         target_q     = critic_target(next_states, next_actions)
-        y = rewards + (gamma ** n_step) * (1 - dones) * target_q
+        y = rewards + gamma * (1 - dones) * target_q
     q = critic(states, actions)
     critic_loss = nn.MSELoss()(q, y)
     critic_opt.zero_grad()
@@ -110,7 +110,7 @@ def learn(batch, steps, actor, critic, actor_target, critic_target,
         critic_target.load_state_dict(critic.state_dict())
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
+def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
           noise_std=0.2, epsilon_min=0.2, epsilon_decay=0.99,
           target_update_freq=500, batch=128, hidden=256, warmup=2000,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
@@ -130,7 +130,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
     critic_opt = torch.optim.Adam(critic.parameters(), lr=critic_lr)
 
     buffer = Buffer()
-    n_step_buffer = deque(maxlen=n_step)
     epsilon = 1.0
     steps_done = 0
 
@@ -143,7 +142,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
 
     for episode in range(max_episodes):
         s = env.reset()
-        n_step_buffer.clear()
         episode_reward = 0.0
         ep_len = 0
         info = {}
@@ -152,21 +150,16 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
             a = act(s, actor, buffer, epsilon, noise_std, warmup)
             s2, r, done, info = env.step(a)
             best_min_dist = min(best_min_dist, info["dist_to_goal"])
-            n_step_buffer.append((s, a, max(r, crash_floor), s2, done))
-            if len(n_step_buffer) == n_step:
-                buffer.add(*get_n_step_transition(n_step_buffer, gamma))
+            buffer.add(s, a, max(r, crash_floor), s2, done)   # plain 1-step transition
             steps_done += 1
             ep_len += 1
             if len(buffer.buffer) > warmup:
                 learn(buffer.sample(batch), steps_done, actor, critic,
                       actor_target, critic_target, actor_opt, critic_opt,
-                      gamma, n_step, target_update_freq)
+                      gamma, target_update_freq)
             s = s2
             episode_reward += r
             if done:
-                while len(n_step_buffer) > 0:            # flush the tail
-                    buffer.add(*get_n_step_transition(n_step_buffer, gamma))
-                    n_step_buffer.popleft()
                 break
 
         reached = bool(info.get("reached_goal", False))
@@ -201,4 +194,4 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
 
 
 if __name__ == "__main__":
-    train(seed=0, verbose=True)
+    train(seed=110, verbose=True)

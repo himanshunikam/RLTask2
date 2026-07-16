@@ -14,7 +14,7 @@ import optuna
 from TD3 import train
 
 # ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [100, 101]
+TUNE_SEEDS   = [115, 119]     # easiest of 100-119 (random occasionally reaches goal)
 MAX_EPISODES = 1500
 N_TRIALS     = 30
 
@@ -31,7 +31,6 @@ def objective(trial):
         critic_lr    = trial.suggest_float("critic_lr", 1e-4, 3e-3, log=True),
         tau          = trial.suggest_float("tau", 1e-3, 2e-2, log=True),
         gamma        = trial.suggest_float("gamma", 0.95, 0.999),
-        n_step       = trial.suggest_int("n_step", 1, 5),
         ou_sigma     = trial.suggest_float("ou_sigma", 0.1, 0.4),
         policy_noise = trial.suggest_float("policy_noise", 0.1, 0.4),
         noise_clip   = trial.suggest_float("noise_clip", 0.3, 0.6),

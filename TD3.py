@@ -1,26 +1,25 @@
 from asteroid import AsteroidStatic
-from collections import deque
 from action_space import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
-from actor_critic import Actor, Critic, Buffer, get_n_step_transition
+from actor_critic import Actor, Critic, Buffer
 from DDPG import OUNoise, ddpg_act        # OU exploration is identical to DDPG
 
 
 def td3_learn(batch, steps, actor, critic1, critic2,
               actor_target, critic1_target, critic2_target,
-              actor_opt, critic_opt, gamma, n_step, tau,
+              actor_opt, critic_opt, gamma, tau,
               policy_noise, noise_clip, policy_delay):
     states, actions, rewards, next_states, dones = batch
 
-    # --- critic update: twin critics + min, with target-policy smoothing ---
+    # --- critic update: twin critics + min, with target-policy smoothing (1-step TD) ---
     with torch.no_grad():
         noise = (torch.randn_like(actions) * policy_noise).clamp(-noise_clip, noise_clip)
         next_actions = (actor_target(next_states) + noise).clamp(-1.0, 1.0)
         target_q = torch.min(critic1_target(next_states, next_actions),
                              critic2_target(next_states, next_actions))
-        y = rewards + (gamma ** n_step) * (1 - dones) * target_q
+        y = rewards + gamma * (1 - dones) * target_q
     critic_loss = nn.MSELoss()(critic1(states, actions), y) \
                 + nn.MSELoss()(critic2(states, actions), y)
     critic_opt.zero_grad()
@@ -40,7 +39,7 @@ def td3_learn(batch, steps, actor, critic1, critic2,
                 tp.data.mul_(1 - tau).add_(tau * p.data)
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
+def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
           tau=0.005, ou_sigma=0.2, policy_noise=0.2, noise_clip=0.5,
           policy_delay=2, batch=128, hidden=256, warmup=2000,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
@@ -64,7 +63,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
         list(critic1.parameters()) + list(critic2.parameters()), lr=critic_lr)
 
     buffer = Buffer()
-    n_step_buffer = deque(maxlen=n_step)
     ou = OUNoise(dim=2, sigma=ou_sigma)
     steps_done = 0
 
@@ -77,7 +75,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
     for episode in range(max_episodes):
         s = env.reset()
         ou.reset()
-        n_step_buffer.clear()
         episode_reward = 0.0
         ep_len = 0
         info = {}
@@ -86,22 +83,17 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
             a = ddpg_act(s, actor, buffer, ou, warmup)
             s2, r, done, info = env.step(a)
             best_min_dist = min(best_min_dist, info["dist_to_goal"])
-            n_step_buffer.append((s, a, max(r, crash_floor), s2, done))
-            if len(n_step_buffer) == n_step:
-                buffer.add(*get_n_step_transition(n_step_buffer, gamma))
+            buffer.add(s, a, max(r, crash_floor), s2, done)   # plain 1-step transition
             steps_done += 1
             ep_len += 1
             if len(buffer.buffer) > warmup:
                 td3_learn(buffer.sample(batch), steps_done, actor, critic1, critic2,
                           actor_target, critic1_target, critic2_target,
-                          actor_opt, critic_opt, gamma, n_step, tau,
+                          actor_opt, critic_opt, gamma, tau,
                           policy_noise, noise_clip, policy_delay)
             s = s2
             episode_reward += r
             if done:
-                while len(n_step_buffer) > 0:            # flush the tail
-                    buffer.add(*get_n_step_transition(n_step_buffer, gamma))
-                    n_step_buffer.popleft()
                 break
 
         reached = bool(info.get("reached_goal", False))
