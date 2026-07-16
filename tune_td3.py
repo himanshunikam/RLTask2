@@ -15,7 +15,7 @@ from TD3 import train
 
 # ---- search / budget knobs (raise for a better search, lower for speed) ----------
 TUNE_SEEDS   = [100, 101]
-MAX_EPISODES = 1500
+MAX_EPISODES = 2500
 N_TRIALS     = 30
 
 
@@ -49,13 +49,16 @@ def objective(trial):
 
 if __name__ == "__main__":
     study = optuna.create_study(
+        study_name="td3_new",
+        storage="sqlite:///tune_td3.db",
         direction="minimize",
+        load_if_exists=True,
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
     study.optimize(objective, n_trials=N_TRIALS)
     print("\n=== best trial ===")
     print("score :", study.best_value)
     print("params:", study.best_params)
-    with open("best_td3.json", "w") as f:
+    with open("best_td3_new.json", "w") as f:
         json.dump(study.best_params, f, indent=2)
-    print("saved -> best_td3.json")
+    print("saved -> best_td3_new.json")

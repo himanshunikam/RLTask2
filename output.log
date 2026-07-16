@@ -1,0 +1,17 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-15 19:22:20,558] A new study created in RDB with name: no-name-22d0fd81-9088-4cd8-a29f-c9d90dbc00ed
+[I 2026-07-15 19:27:34,160] Trial 0 finished with value: 12282768.932238687 and parameters: {'actor_lr': 4.919041599617353e-05, 'critic_lr': 0.0025391776950406493, 'tau': 0.011966755908676888, 'gamma': 0.9697906800315349, 'n_step': 2, 'ou_sigma': 0.3508629775667984, 'policy_noise': 0.37279637394352716, 'noise_clip': 0.4733696928488824, 'policy_delay': 3, 'batch': 64, 'hidden': 256}. Best is trial 0 with value: 12282768.932238687.
+[I 2026-07-15 19:38:30,903] Trial 1 finished with value: 6133348.453668434 and parameters: {'actor_lr': 3.952868385118983e-05, 'critic_lr': 0.0009502004871276334, 'tau': 0.011107577414078373, 'gamma': 0.9624932748663875, 'n_step': 3, 'ou_sigma': 0.2004521605186168, 'policy_noise': 0.10213995145795642, 'noise_clip': 0.49515250197303345, 'policy_delay': 4, 'batch': 128, 'hidden': 128}. Best is trial 1 with value: 6133348.453668434.
+[I 2026-07-15 19:58:14,888] Trial 2 finished with value: 12297118.25437795 and parameters: {'actor_lr': 8.550792952664949e-05, 'critic_lr': 0.0004331174956424055, 'tau': 0.006968593130147388, 'gamma': 0.9876658020263351, 'n_step': 3, 'ou_sigma': 0.2312083450785473, 'policy_noise': 0.323996486632657, 'noise_clip': 0.4464276574324956, 'policy_delay': 2, 'batch': 64, 'hidden': 128}. Best is trial 1 with value: 6133348.453668434.
+[I 2026-07-15 20:16:11,597] Trial 3 finished with value: 6270311.368896228 and parameters: {'actor_lr': 1.9966633410171263e-05, 'critic_lr': 0.001194636829448708, 'tau': 0.0022532520852101565, 'gamma': 0.9839100910552746, 'n_step': 4, 'ou_sigma': 0.22036729940056543, 'policy_noise': 0.2866657236356855, 'noise_clip': 0.5201208142280416, 'policy_delay': 3, 'batch': 256, 'hidden': 256}. Best is trial 1 with value: 6133348.453668434.
+[I 2026-07-15 20:28:40,357] Trial 4 finished with value: 12535460.997447563 and parameters: {'actor_lr': 0.0005119723753396425, 'critic_lr': 0.0002610193020457866, 'tau': 0.002206454017301956, 'gamma': 0.9638792346263931, 'n_step': 4, 'ou_sigma': 0.3731393545344186, 'policy_noise': 0.3838648589600153, 'noise_clip': 0.3807289748953851, 'policy_delay': 4, 'batch': 256, 'hidden': 128}. Best is trial 1 with value: 6133348.453668434.
+[I 2026-07-15 20:28:42,017] Trial 5 pruned. 
+[I 2026-07-15 20:28:42,216] Trial 6 pruned. 
+[I 2026-07-15 20:56:22,795] Trial 7 finished with value: 12251232.495385814 and parameters: {'actor_lr': 9.988313087386687e-05, 'critic_lr': 0.0001746884504131217, 'tau': 0.0011628658475744751, 'gamma': 0.9862482742308699, 'n_step': 3, 'ou_sigma': 0.2717020286576964, 'policy_noise': 0.333462024174238, 'noise_clip': 0.595688364271898, 'policy_delay': 3, 'batch': 256, 'hidden': 256}. Best is trial 1 with value: 6133348.453668434.
+[I 2026-07-15 20:56:23,848] Trial 8 pruned. 
+[I 2026-07-15 20:56:23,987] Trial 9 pruned. 
+
+=== best trial ===
+score : 6133348.453668434
+params: {'actor_lr': 3.952868385118983e-05, 'critic_lr': 0.0009502004871276334, 'tau': 0.011107577414078373, 'gamma': 0.9624932748663875, 'n_step': 3, 'ou_sigma': 0.2004521605186168, 'policy_noise': 0.10213995145795642, 'noise_clip': 0.49515250197303345, 'policy_delay': 4, 'batch': 128, 'hidden': 128}
+saved -> best_td3.json
