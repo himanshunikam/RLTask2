@@ -46,7 +46,10 @@ def objective(trial):
 
 if __name__ == "__main__":
     study = optuna.create_study(
+        study_name="ddpg_tune",
+        storage="sqlite:///tune_ddpg.db",     # <-- persists every completed trial to disk
         direction="minimize",
+        load_if_exists=True,  
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
     study.optimize(objective, n_trials=N_TRIALS)

@@ -1,0 +1,37 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-15 20:56:44,483] A new study created in RDB with name: ddpg_tune
+[I 2026-07-15 21:07:36,015] Trial 0 finished with value: 12381290.2151669 and parameters: {'actor_lr': 3.080579300604683e-05, 'critic_lr': 0.0006453616496736547, 'tau': 0.0011631697242404228, 'gamma': 0.9689244840308955, 'n_step': 3, 'ou_sigma': 0.22079500310965675, 'batch': 128, 'hidden': 128}. Best is trial 0 with value: 12381290.2151669.
+[I 2026-07-15 21:28:06,999] Trial 1 finished with value: 5779879.635674244 and parameters: {'actor_lr': 0.0009364208408813036, 'critic_lr': 0.0019532695536889637, 'tau': 0.0016177124769163904, 'gamma': 0.9884361430528119, 'n_step': 4, 'ou_sigma': 0.15618653217072012, 'batch': 256, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 21:41:33,950] Trial 2 finished with value: 12258053.231990525 and parameters: {'actor_lr': 1.8897072421168362e-05, 'critic_lr': 0.00013081495744427427, 'tau': 0.0040110924972152195, 'gamma': 0.9801969112845936, 'n_step': 5, 'ou_sigma': 0.2182996122297608, 'batch': 128, 'hidden': 128}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 21:51:07,817] Trial 3 finished with value: 12417442.39492266 and parameters: {'actor_lr': 1.1342701143195138e-05, 'critic_lr': 0.0017148688977993724, 'tau': 0.0019082471317671277, 'gamma': 0.9921385450869732, 'n_step': 3, 'ou_sigma': 0.11450064182835061, 'batch': 64, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 22:31:44,715] Trial 4 finished with value: 12045885.564974992 and parameters: {'actor_lr': 0.0008936800307394529, 'critic_lr': 0.00016193035258052474, 'tau': 0.0026275528679283733, 'gamma': 0.9988478867779602, 'n_step': 3, 'ou_sigma': 0.26465085956569334, 'batch': 128, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 22:31:44,838] Trial 5 pruned. 
+[I 2026-07-15 22:31:44,954] Trial 6 pruned. 
+[I 2026-07-15 22:40:39,627] Trial 7 finished with value: 6073717.528243059 and parameters: {'actor_lr': 0.0003882589832550462, 'critic_lr': 0.0010949241611687458, 'tau': 0.008708467476530271, 'gamma': 0.965766126614407, 'n_step': 5, 'ou_sigma': 0.36240576235695277, 'batch': 256, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 22:40:39,750] Trial 8 pruned. 
+[I 2026-07-15 22:40:39,872] Trial 9 pruned. 
+[I 2026-07-15 22:40:40,007] Trial 10 pruned. 
+[I 2026-07-15 22:40:40,140] Trial 11 pruned. 
+[I 2026-07-15 22:40:40,276] Trial 12 pruned. 
+[I 2026-07-15 22:40:40,404] Trial 13 pruned. 
+[I 2026-07-15 22:40:40,538] Trial 14 pruned. 
+[I 2026-07-15 22:40:40,664] Trial 15 pruned. 
+[I 2026-07-15 22:40:40,790] Trial 16 pruned. 
+[I 2026-07-15 22:40:40,915] Trial 17 pruned. 
+[I 2026-07-15 22:40:41,047] Trial 18 pruned. 
+[I 2026-07-15 22:40:41,180] Trial 19 pruned. 
+[I 2026-07-15 22:40:41,308] Trial 20 pruned. 
+[I 2026-07-15 22:40:49,617] Trial 21 pruned. 
+[I 2026-07-15 22:40:49,744] Trial 22 pruned. 
+[I 2026-07-15 22:40:49,869] Trial 23 pruned. 
+[I 2026-07-15 22:57:25,625] Trial 24 finished with value: 6103330.725406514 and parameters: {'actor_lr': 0.00043298444253232353, 'critic_lr': 0.0029856929840113783, 'tau': 0.0019901024136195935, 'gamma': 0.993736977957184, 'n_step': 5, 'ou_sigma': 0.2862474165291881, 'batch': 128, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 22:57:25,755] Trial 25 pruned. 
+[I 2026-07-15 22:57:25,884] Trial 26 pruned. 
+[I 2026-07-15 22:57:26,021] Trial 27 pruned. 
+[I 2026-07-15 23:20:58,241] Trial 28 finished with value: 6213286.632025259 and parameters: {'actor_lr': 0.0005180848463879891, 'critic_lr': 0.002130659396112695, 'tau': 0.0036018033008377516, 'gamma': 0.9944510907829496, 'n_step': 4, 'ou_sigma': 0.19984606344488726, 'batch': 64, 'hidden': 256}. Best is trial 1 with value: 5779879.635674244.
+[I 2026-07-15 23:20:58,373] Trial 29 pruned. 
+
+=== best trial ===
+score : 5779879.635674244
+params: {'actor_lr': 0.0009364208408813036, 'critic_lr': 0.0019532695536889637, 'tau': 0.0016177124769163904, 'gamma': 0.9884361430528119, 'n_step': 4, 'ou_sigma': 0.15618653217072012, 'batch': 256, 'hidden': 256}
+saved -> best_ddpg.json
