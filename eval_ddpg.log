@@ -1,0 +1,22 @@
+nohup: Eingabe wird ignoriert
+[DDPG] config: {'actor_lr': 1.6616863400106755e-05, 'critic_lr': 0.00048020550834762906, 'tau': 0.001819343349469396, 'gamma': 0.991850389232203, 'ou_sigma': 0.37085546033055716, 'batch': 128, 'hidden': 256}
+
+[DDPG] seed 0: metric1=None | metric2_len=None | metric2_calls=None | minDist=1.74
+[DDPG] seed 1: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.53
+[DDPG] seed 2: metric1=1235 | metric2_len=27 | metric2_calls=368637 | minDist=0.06
+[DDPG] seed 3: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.73
+[DDPG] seed 4: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.72
+[DDPG] seed 5: metric1=3185 | metric2_len=26 | metric2_calls=7536 | minDist=0.05
+[DDPG] seed 6: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.45
+[DDPG] seed 7: metric1=7228 | metric2_len=23 | metric2_calls=12653 | minDist=0.07
+[DDPG] seed 8: metric1=4573 | metric2_len=22 | metric2_calls=23042 | minDist=0.04
+[DDPG] seed 9: metric1=6146 | metric2_len=23 | metric2_calls=31935 | minDist=0.07
+
+=== DDPG SUMMARY (averages over solved seeds) ===
+  method: DDPG
+  solved: 5/10
+  avg_metric1_calls_to_solve: 4473.4
+  avg_metric2_shortest_len: 24.2
+  avg_metric2_assoc_calls: 88760.6
+
+saved -> eval_ddpg_results.json
