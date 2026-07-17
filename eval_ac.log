@@ -1,0 +1,22 @@
+nohup: Eingabe wird ignoriert
+[Actor-Critic] config: {'actor_lr': 4.263814499568788e-05, 'critic_lr': 0.00013260806402042022, 'gamma': 0.978599770009309, 'noise_std': 0.17052032023329822, 'epsilon_min': 0.2173505419416641, 'epsilon_decay': 0.9947651965200155, 'target_update_freq': 899, 'batch': 64, 'hidden': 256}
+
+[Actor-Critic] seed 0: metric1=None | metric2_len=None | metric2_calls=None | minDist=1.38
+[Actor-Critic] seed 1: metric1=13159 | metric2_len=25 | metric2_calls=156006 | minDist=0.12
+[Actor-Critic] seed 2: metric1=75105 | metric2_len=26 | metric2_calls=116524 | minDist=0.04
+[Actor-Critic] seed 3: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.76
+[Actor-Critic] seed 4: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.67
+[Actor-Critic] seed 5: metric1=10166 | metric2_len=27 | metric2_calls=15104 | minDist=0.05
+[Actor-Critic] seed 6: metric1=374705 | metric2_len=32 | metric2_calls=418127 | minDist=0.20
+[Actor-Critic] seed 7: metric1=6738 | metric2_len=23 | metric2_calls=28341 | minDist=0.05
+[Actor-Critic] seed 8: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.66
+[Actor-Critic] seed 9: metric1=5207 | metric2_len=23 | metric2_calls=46506 | minDist=0.04
+
+=== Actor-Critic SUMMARY (averages over solved seeds) ===
+  method: Actor-Critic
+  solved: 6/10
+  avg_metric1_calls_to_solve: 80846.66666666667
+  avg_metric2_shortest_len: 26.0
+  avg_metric2_assoc_calls: 130101.33333333333
+
+saved -> eval_actor_critic_results.json
