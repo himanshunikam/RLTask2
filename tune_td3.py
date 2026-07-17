@@ -56,6 +56,7 @@ if __name__ == "__main__":
         study_name="td3_s2",
         storage="sqlite:///tune_td3_s2.db",  
         direction="minimize",
+        load_if_exists=True,
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
     study.optimize(objective, n_trials=N_TRIALS)
@@ -65,4 +66,4 @@ if __name__ == "__main__":
     print("metric2 (best trial):", study.best_trial.user_attrs)
     with open("best_td3.json", "w") as f:
         json.dump(study.best_params, f, indent=2)
-    print("saved -> best_td3.json")
+    print("saved -> best_td3_new.json")
