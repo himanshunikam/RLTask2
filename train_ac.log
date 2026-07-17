@@ -1,0 +1,37 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-15 21:26:54,760] A new study created in RDB with name: actor_tune
+[I 2026-07-15 21:51:06,702] Trial 0 finished with value: 12352157.096448563 and parameters: {'actor_lr': 2.1706212077472617e-05, 'critic_lr': 0.0017707300180838062, 'gamma': 0.9974693756546011, 'n_step': 1, 'noise_std': 0.10973089337707653, 'epsilon_min': 0.28063117510086133, 'epsilon_decay': 0.9973425271772864, 'target_update_freq': 367, 'batch': 256, 'hidden': 128}. Best is trial 0 with value: 12352157.096448563.
+[I 2026-07-15 22:05:02,269] Trial 1 finished with value: 12173671.917785065 and parameters: {'actor_lr': 2.9674210269112832e-05, 'critic_lr': 0.0006669891729123074, 'gamma': 0.9521521559136541, 'n_step': 4, 'noise_std': 0.22824565563066496, 'epsilon_min': 0.13865648191223018, 'epsilon_decay': 0.9972414213808573, 'target_update_freq': 387, 'batch': 256, 'hidden': 128}. Best is trial 1 with value: 12173671.917785065.
+[I 2026-07-15 22:16:57,344] Trial 2 finished with value: 12172134.599152617 and parameters: {'actor_lr': 0.0001717115388340222, 'critic_lr': 0.0020634430082545714, 'gamma': 0.9558450644263681, 'n_step': 1, 'noise_std': 0.38900597815515164, 'epsilon_min': 0.16455080909655967, 'epsilon_decay': 0.9935612100593234, 'target_update_freq': 457, 'batch': 256, 'hidden': 128}. Best is trial 2 with value: 12172134.599152617.
+[I 2026-07-15 22:49:31,732] Trial 3 finished with value: 12218568.65802185 and parameters: {'actor_lr': 0.00013082055058956797, 'critic_lr': 0.0004645839182747396, 'gamma': 0.9718626050471351, 'n_step': 2, 'noise_std': 0.19439085768864867, 'epsilon_min': 0.09303571141210508, 'epsilon_decay': 0.9939330763606115, 'target_update_freq': 475, 'batch': 128, 'hidden': 256}. Best is trial 2 with value: 12172134.599152617.
+[I 2026-07-15 23:14:45,572] Trial 4 finished with value: 6304302.135553382 and parameters: {'actor_lr': 0.00028619164444728133, 'critic_lr': 0.00017113449552163458, 'gamma': 0.9821642117389293, 'n_step': 2, 'noise_std': 0.36325333432874163, 'epsilon_min': 0.2723067713430836, 'epsilon_decay': 0.9937352994463112, 'target_update_freq': 730, 'batch': 256, 'hidden': 256}. Best is trial 4 with value: 6304302.135553382.
+[I 2026-07-15 23:14:45,704] Trial 5 pruned. 
+[I 2026-07-15 23:14:45,894] Trial 6 pruned. 
+[I 2026-07-15 23:14:46,045] Trial 7 pruned. 
+[I 2026-07-15 23:14:46,200] Trial 8 pruned. 
+[I 2026-07-15 23:14:46,333] Trial 9 pruned. 
+[I 2026-07-15 23:14:46,486] Trial 10 pruned. 
+[I 2026-07-15 23:14:46,675] Trial 11 pruned. 
+[I 2026-07-15 23:14:46,822] Trial 12 pruned. 
+[I 2026-07-15 23:39:07,246] Trial 13 finished with value: 5462954.573895224 and parameters: {'actor_lr': 0.0004136360365127853, 'critic_lr': 0.002997117100802685, 'gamma': 0.9809963333866751, 'n_step': 2, 'noise_std': 0.3283351546737736, 'epsilon_min': 0.25846395030593505, 'epsilon_decay': 0.992183292253035, 'target_update_freq': 582, 'batch': 256, 'hidden': 256}. Best is trial 13 with value: 5462954.573895224.
+[I 2026-07-15 23:39:07,390] Trial 14 pruned. 
+[I 2026-07-15 23:39:07,527] Trial 15 pruned. 
+[I 2026-07-15 23:39:07,668] Trial 16 pruned. 
+[I 2026-07-15 23:39:07,814] Trial 17 pruned. 
+[I 2026-07-15 23:39:08,000] Trial 18 pruned. 
+[I 2026-07-15 23:39:08,141] Trial 19 pruned. 
+[I 2026-07-15 23:39:08,287] Trial 20 pruned. 
+[I 2026-07-15 23:39:08,431] Trial 21 pruned. 
+[I 2026-07-15 23:39:08,587] Trial 22 pruned. 
+[I 2026-07-15 23:39:08,746] Trial 23 pruned. 
+[I 2026-07-15 23:39:08,916] Trial 24 pruned. 
+[I 2026-07-15 23:39:09,057] Trial 25 pruned. 
+[I 2026-07-15 23:39:09,240] Trial 26 pruned. 
+[I 2026-07-15 23:39:09,377] Trial 27 pruned. 
+[I 2026-07-15 23:39:09,558] Trial 28 pruned. 
+[I 2026-07-15 23:39:09,724] Trial 29 pruned. 
+
+=== best trial ===
+score : 5462954.573895224
+params: {'actor_lr': 0.0004136360365127853, 'critic_lr': 0.002997117100802685, 'gamma': 0.9809963333866751, 'n_step': 2, 'noise_std': 0.3283351546737736, 'epsilon_min': 0.25846395030593505, 'epsilon_decay': 0.992183292253035, 'target_update_freq': 582, 'batch': 256, 'hidden': 256}
+saved -> best_actor_critic.json
