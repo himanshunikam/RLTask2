@@ -1,0 +1,81 @@
+{
+  "per_seed": [
+    {
+      "seed": 0,
+      "metric1_calls_to_solve": 121118,
+      "metric2_shortest_len": 26,
+      "metric2_assoc_calls": 185256,
+      "best_min_dist": 0.09610965020752064
+    },
+    {
+      "seed": 1,
+      "metric1_calls_to_solve": 32362,
+      "metric2_shortest_len": 23,
+      "metric2_assoc_calls": 149736,
+      "best_min_dist": 0.056452300545835006
+    },
+    {
+      "seed": 2,
+      "metric1_calls_to_solve": 10022,
+      "metric2_shortest_len": 25,
+      "metric2_assoc_calls": 36883,
+      "best_min_dist": 0.03177962214172731
+    },
+    {
+      "seed": 3,
+      "metric1_calls_to_solve": 250901,
+      "metric2_shortest_len": 35,
+      "metric2_assoc_calls": 297863,
+      "best_min_dist": 0.1360148512201174
+    },
+    {
+      "seed": 4,
+      "metric1_calls_to_solve": 144963,
+      "metric2_shortest_len": 83,
+      "metric2_assoc_calls": 202007,
+      "best_min_dist": 0.266162761640599
+    },
+    {
+      "seed": 5,
+      "metric1_calls_to_solve": 3192,
+      "metric2_shortest_len": 25,
+      "metric2_assoc_calls": 92191,
+      "best_min_dist": 0.015499638902685227
+    },
+    {
+      "seed": 6,
+      "metric1_calls_to_solve": 45808,
+      "metric2_shortest_len": 24,
+      "metric2_assoc_calls": 177604,
+      "best_min_dist": 0.12633873226224285
+    },
+    {
+      "seed": 7,
+      "metric1_calls_to_solve": 3151,
+      "metric2_shortest_len": 23,
+      "metric2_assoc_calls": 5414,
+      "best_min_dist": 0.047619684664282846
+    },
+    {
+      "seed": 8,
+      "metric1_calls_to_solve": 279128,
+      "metric2_shortest_len": 92,
+      "metric2_assoc_calls": 324583,
+      "best_min_dist": 0.2685724488153221
+    },
+    {
+      "seed": 9,
+      "metric1_calls_to_solve": 2301,
+      "metric2_shortest_len": 23,
+      "metric2_assoc_calls": 7650,
+      "best_min_dist": 0.07162679732135997
+    }
+  ],
+  "summary": {
+    "method": "TD3",
+    "solved": "10/10",
+    "avg_metric1_calls_to_solve": 89294.6,
+    "avg_metric2_shortest_len": 37.9,
+    "avg_metric2_assoc_calls": 147918.7
+  }
+}
