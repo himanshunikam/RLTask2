@@ -128,7 +128,7 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
         print("Metric 1 (calls to first solve):", metric1_calls_to_first_solve)
         print("Metric 2 (shortest success len):", best_success_len, "at calls:", metric2_calls)
 
-    return metric1_calls_to_first_solve, best_min_dist, best_success_len
+    return metric1_calls_to_first_solve, best_min_dist, best_success_len, metric2_calls
 
 
 if __name__ == "__main__":

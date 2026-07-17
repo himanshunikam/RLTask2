@@ -37,8 +37,8 @@ def objective(trial):
     )
     scores = []
     for i, seed in enumerate(TUNE_SEEDS):
-        m1, bmd, m2_len = train(seed=seed, max_episodes=MAX_EPISODES,
-                                report_step_offset=i * MAX_EPISODES, trial=trial, **params)
+        m1, bmd, m2_len, _ = train(seed=seed, max_episodes=MAX_EPISODES,
+                                   report_step_offset=i * MAX_EPISODES, trial=trial, **params)
         scores.append(score(m1, bmd))
         trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)   # shortest successful episode (or None)
     solved = [v for k, v in trial.user_attrs.items()
