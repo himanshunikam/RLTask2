@@ -1,0 +1,39 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-16 18:50:28,056] A new study created in RDB with name: td3_s2
+[I 2026-07-16 19:33:11,209] Trial 0 finished with value: 5551558.12664828 and parameters: {'actor_lr': 5.8744508808031114e-05, 'critic_lr': 0.0009917220389342445, 'tau': 0.009469080232960416, 'gamma': 0.996806957779306, 'ou_sigma': 0.3643065747579747, 'policy_noise': 0.30028430975001597, 'noise_clip': 0.33005995877118244, 'policy_delay': 1, 'batch': 64, 'hidden': 128}. Best is trial 0 with value: 5551558.12664828.
+[I 2026-07-16 20:09:01,211] Trial 1 finished with value: 5265039.426947096 and parameters: {'actor_lr': 7.13246585788489e-05, 'critic_lr': 0.0007106179698672786, 'tau': 0.0024621407076217874, 'gamma': 0.9725292824482035, 'ou_sigma': 0.3205014101516863, 'policy_noise': 0.29300958555959555, 'noise_clip': 0.41366674957926486, 'policy_delay': 4, 'batch': 256, 'hidden': 128}. Best is trial 1 with value: 5265039.426947096.
+[I 2026-07-16 20:24:25,652] Trial 2 finished with value: 10466.0 and parameters: {'actor_lr': 0.00013143532896951158, 'critic_lr': 0.0006579861846555853, 'tau': 0.0029115043749158138, 'gamma': 0.9718811463326461, 'ou_sigma': 0.3856056675142324, 'policy_noise': 0.23730027049954638, 'noise_clip': 0.5134167866822159, 'policy_delay': 4, 'batch': 256, 'hidden': 256}. Best is trial 2 with value: 10466.0.
+[I 2026-07-16 21:03:23,637] Trial 3 finished with value: 343954.0 and parameters: {'actor_lr': 6.454436520540233e-05, 'critic_lr': 0.000578855522317557, 'tau': 0.016699805625494325, 'gamma': 0.9546195460297296, 'ou_sigma': 0.17620097619616898, 'policy_noise': 0.10374504800111961, 'noise_clip': 0.4918286923543643, 'policy_delay': 3, 'batch': 64, 'hidden': 128}. Best is trial 2 with value: 10466.0.
+[I 2026-07-16 21:46:08,887] Trial 4 finished with value: 5908339.397134577 and parameters: {'actor_lr': 6.372668303240647e-05, 'critic_lr': 0.0005343849217659318, 'tau': 0.001400350173941349, 'gamma': 0.9615266811405024, 'ou_sigma': 0.24847539674787547, 'policy_noise': 0.18458180949022265, 'noise_clip': 0.3881112246734382, 'policy_delay': 2, 'batch': 128, 'hidden': 256}. Best is trial 2 with value: 10466.0.
+[I 2026-07-16 21:46:11,361] Trial 5 pruned. 
+[I 2026-07-16 21:46:11,497] Trial 6 pruned. 
+[I 2026-07-16 21:46:13,373] Trial 7 pruned. 
+[I 2026-07-16 22:12:06,154] Trial 8 finished with value: 592.5 and parameters: {'actor_lr': 0.00013554526119657258, 'critic_lr': 0.0018617367032502331, 'tau': 0.008047838204200066, 'gamma': 0.961859326025926, 'ou_sigma': 0.317937783806691, 'policy_noise': 0.339111229629921, 'noise_clip': 0.4959085867496832, 'policy_delay': 1, 'batch': 128, 'hidden': 256}. Best is trial 8 with value: 592.5.
+[I 2026-07-16 22:26:18,177] Trial 9 finished with value: 7021.5 and parameters: {'actor_lr': 4.206175596789459e-05, 'critic_lr': 0.0004280666002115382, 'tau': 0.005205237522394776, 'gamma': 0.9882428730960495, 'ou_sigma': 0.13858083094286372, 'policy_noise': 0.3277815086626352, 'noise_clip': 0.31454428183296407, 'policy_delay': 2, 'batch': 128, 'hidden': 128}. Best is trial 8 with value: 592.5.
+[I 2026-07-16 22:26:18,324] Trial 10 pruned. 
+[I 2026-07-16 22:26:18,469] Trial 11 pruned. 
+[I 2026-07-16 22:26:20,620] Trial 12 pruned. 
+[I 2026-07-16 22:26:20,761] Trial 13 pruned. 
+[I 2026-07-16 22:26:20,899] Trial 14 pruned. 
+[I 2026-07-16 22:26:22,595] Trial 15 pruned. 
+[I 2026-07-16 22:26:22,732] Trial 16 pruned. 
+[I 2026-07-16 22:26:22,927] Trial 17 pruned. 
+[I 2026-07-16 22:26:23,080] Trial 18 pruned. 
+[I 2026-07-16 22:26:24,411] Trial 19 pruned. 
+[I 2026-07-16 22:26:24,552] Trial 20 pruned. 
+[I 2026-07-16 22:26:24,699] Trial 21 pruned. 
+[I 2026-07-16 22:26:24,981] Trial 22 pruned. 
+[I 2026-07-16 22:26:25,145] Trial 23 pruned. 
+[I 2026-07-16 22:27:44,668] Trial 24 pruned. 
+[I 2026-07-16 22:27:44,815] Trial 25 pruned. 
+[I 2026-07-16 22:27:46,429] Trial 26 pruned. 
+[I 2026-07-16 22:27:47,994] Trial 27 pruned. 
+[I 2026-07-16 22:27:48,181] Trial 28 pruned. 
+[I 2026-07-16 22:27:48,336] Trial 29 pruned. 
+new code running
+
+=== best trial ===
+score : 592.5
+params: {'actor_lr': 0.00013554526119657258, 'critic_lr': 0.0018617367032502331, 'tau': 0.008047838204200066, 'gamma': 0.961859326025926, 'ou_sigma': 0.317937783806691, 'policy_noise': 0.339111229629921, 'noise_clip': 0.4959085867496832, 'policy_delay': 1, 'batch': 128, 'hidden': 256}
+metric2 (best trial): {'metric2_len_min': 22, 'metric2_len_seed115': 22, 'metric2_len_seed119': 22}
+saved -> best_td3.json

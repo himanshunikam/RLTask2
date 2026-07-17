@@ -1,10 +1,9 @@
 from asteroid import AsteroidStatic
-from collections import deque
 from action_space import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
-from actor_critic import Actor, Critic, Buffer, get_n_step_transition
+from actor_critic import Actor, Critic, Buffer
 
 
 class OUNoise:
@@ -28,13 +27,13 @@ def ddpg_act(s, actor, buffer, ou, warmup):
 
 
 def ddpg_learn(batch, actor, critic, actor_target, critic_target,
-               actor_opt, critic_opt, gamma, n_step, tau):
+               actor_opt, critic_opt, gamma, tau):
     states, actions, rewards, next_states, dones = batch
 
-    # --- critic update ---
+    # --- critic update: 1-step TD target ---
     with torch.no_grad():
         target_q = critic_target(next_states, actor_target(next_states))
-        y = rewards + (gamma ** n_step) * (1 - dones) * target_q
+        y = rewards + gamma * (1 - dones) * target_q
     critic_loss = nn.MSELoss()(critic(states, actions), y)
     critic_opt.zero_grad()
     critic_loss.backward()
@@ -53,7 +52,7 @@ def ddpg_learn(batch, actor, critic, actor_target, critic_target,
             tp.data.mul_(1 - tau).add_(tau * p.data)
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
+def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
           tau=0.005, ou_sigma=0.2, batch=128, hidden=256, warmup=2000,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
           report_step_offset=0, trial=None, verbose=False):
@@ -72,7 +71,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
     critic_opt = torch.optim.Adam(critic.parameters(), lr=critic_lr)
 
     buffer = Buffer()
-    n_step_buffer = deque(maxlen=n_step)
     ou = OUNoise(dim=2, sigma=ou_sigma)
     steps_done = 0
 
@@ -85,7 +83,6 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
     for episode in range(max_episodes):
         s = env.reset()
         ou.reset()
-        n_step_buffer.clear()
         episode_reward = 0.0
         ep_len = 0
         info = {}
@@ -94,20 +91,15 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, n_step=3,
             a = ddpg_act(s, actor, buffer, ou, warmup)
             s2, r, done, info = env.step(a)
             best_min_dist = min(best_min_dist, info["dist_to_goal"])
-            n_step_buffer.append((s, a, max(r, crash_floor), s2, done))
-            if len(n_step_buffer) == n_step:
-                buffer.add(*get_n_step_transition(n_step_buffer, gamma))
+            buffer.add(s, a, max(r, crash_floor), s2, done)   # plain 1-step transition
             steps_done += 1
             ep_len += 1
             if len(buffer.buffer) > warmup:
                 ddpg_learn(buffer.sample(batch), actor, critic, actor_target,
-                           critic_target, actor_opt, critic_opt, gamma, n_step, tau)
+                           critic_target, actor_opt, critic_opt, gamma, tau)
             s = s2
             episode_reward += r
             if done:
-                while len(n_step_buffer) > 0:            # flush the tail
-                    buffer.add(*get_n_step_transition(n_step_buffer, gamma))
-                    n_step_buffer.popleft()
                 break
 
         reached = bool(info.get("reached_goal", False))

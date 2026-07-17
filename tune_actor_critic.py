@@ -15,9 +15,9 @@ import optuna
 from actor_critic import train
 
 # ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [100, 101]     # DISJOINT from eval seeds 0-9
-MAX_EPISODES = 1500           # per-seed episode budget per trial
-N_TRIALS     = 10
+TUNE_SEEDS   = [115, 119]     # 107 111
+MAX_EPISODES = 5000           # per-seed episode budget per trial
+N_TRIALS     = 50
 
 
 def score(metric1, best_min_dist):
@@ -31,7 +31,6 @@ def objective(trial):
         actor_lr           = trial.suggest_float("actor_lr", 1e-5, 1e-3, log=True),
         critic_lr          = trial.suggest_float("critic_lr", 1e-4, 3e-3, log=True),
         gamma              = trial.suggest_float("gamma", 0.95, 0.999),
-        n_step             = trial.suggest_int("n_step", 1, 5),
         noise_std          = trial.suggest_float("noise_std", 0.05, 0.4),
         epsilon_min        = trial.suggest_float("epsilon_min", 0.05, 0.3),
         epsilon_decay      = trial.suggest_float("epsilon_decay", 0.99, 0.9999),
@@ -41,14 +40,21 @@ def objective(trial):
     )
     scores = []
     for i, seed in enumerate(TUNE_SEEDS):
-        m1, bmd, _ = train(seed=seed, max_episodes=MAX_EPISODES,
-                           report_step_offset=i * MAX_EPISODES, trial=trial, **params)
+        m1, bmd, m2_len = train(seed=seed, max_episodes=MAX_EPISODES,
+                                report_step_offset=i * MAX_EPISODES, trial=trial, **params)
         scores.append(score(m1, bmd))
+        trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)   # shortest successful episode (or None)
+    solved = [v for k, v in trial.user_attrs.items()
+              if k.startswith("metric2_len_seed") and v is not None]
+    trial.set_user_attr("metric2_len_min", int(min(solved)) if solved else None)
     return float(np.mean(scores))
 
 
 if __name__ == "__main__":
+    print("new code running!")
     study = optuna.create_study(
+        study_name="ac_session2",
+        storage="sqlite:///tune_ac_s2.db",  
         direction="minimize",
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
@@ -56,6 +62,7 @@ if __name__ == "__main__":
     print("\n=== best trial ===")
     print("score :", study.best_value)
     print("params:", study.best_params)
+    print("metric2 (best trial):", study.best_trial.user_attrs)
     with open("best_actor_critic.json", "w") as f:
         json.dump(study.best_params, f, indent=2)
     print("saved -> best_actor_critic.json")
