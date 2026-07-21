@@ -59,18 +59,6 @@ class Buffer():
                 torch.tensor(np.array(dones), dtype=torch.float32))
 
 
-def get_n_step_transition(n_buf, gamma):
-    s0, a0 = n_buf[0][0], n_buf[0][1]
-    R = 0.0
-    next_s, done = n_buf[-1][3], n_buf[-1][4]
-    for k, (_, _, r, s2, d) in enumerate(n_buf):
-        R += (gamma ** k) * r
-        if d:
-            next_s, done = s2, True
-            break
-    return s0, a0, R, next_s, done
-
-
 def act(s, actor, buffer, epsilon, noise_std, warmup):
     if len(buffer.buffer) < warmup:
         return np.random.choice([-1.0, 1.0], size=2)          # warmup: bang-bang random
