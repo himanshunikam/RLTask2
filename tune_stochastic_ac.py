@@ -17,8 +17,8 @@ def score(metric1, best_min_dist):
 
 def objective(trial):
     params = dict(
-        actor_lr           = trial.suggest_float("actor_lr", 1e-5, 1e-1, log=True),
-        critic_lr          = trial.suggest_float("critic_lr", 1e-5, 3e-1, log=True),
+        actor_lr           = trial.suggest_float("actor_lr", 1e-5, 1e-3, log=True),
+        critic_lr          = trial.suggest_float("critic_lr", 1e-4, 3e-3, log=True),
         gamma              = trial.suggest_float("gamma", 0.9, 0.999),
         beta = trial.suggest_float("beta", 1e-3, 0.1, log=True),
         hidden             = trial.suggest_categorical("hidden", [128, 256, 512]),
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         direction="minimize",
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
     )
-    study.optimize(objective, n_trials=N_TRIALS)
+    study.optimize(objective, n_trials=N_TRIALS, catch=(ValueError, FloatingPointError))
     print("\n=== best trial ===")
     print("score :", study.best_value)
     print("params:", study.best_params)

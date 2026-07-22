@@ -16,20 +16,24 @@ def normalize(s):
 
 
 import torch.distributions as D
-
-class GaussianActor(nn.Module):
+LOG_STD_MIN, LOG_STD_MAX = -5.0, 2.0
+class Actor(nn.Module):
     def __init__(self, s_dim=4, a_dim=2, hidden=256):
         super().__init__()
         self.body = nn.Sequential(nn.Linear(s_dim, hidden), nn.ReLU(),
                                   nn.Linear(hidden, hidden), nn.ReLU())
         self.mean    = nn.Linear(hidden, a_dim)
         self.log_std = nn.Parameter(torch.zeros(a_dim))   # learnable, state-independent std
+
+    
+
     def forward(self, s):
         h = self.body(normalize(s))
-        return D.Normal(self.mean(h), self.log_std.exp())
+        log_std = self.log_std.clamp(LOG_STD_MIN, LOG_STD_MAX)
+        return D.Normal(self.mean(h), log_std.exp())
 
 
-class VCritic(nn.Module):
+class Critic(nn.Module):
     def __init__(self, s_dim=4, hidden=256):
         super().__init__()
         self.net = nn.Sequential(nn.Linear(s_dim, hidden), nn.ReLU(),
@@ -56,8 +60,8 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, hidden=256, beta= 0.0
     epsilon = 1.0
     steps_done = 0
 
-    actor  = GaussianActor(hidden=hidden)
-    critic = VCritic(hidden=hidden)
+    actor  = Actor(hidden=hidden)
+    critic = Critic(hidden=hidden)
     actor_opt  = torch.optim.Adam(actor.parameters(),  lr=actor_lr)
     critic_opt = torch.optim.Adam(critic.parameters(), lr=critic_lr)
     for episode in range(max_episodes):
