@@ -56,7 +56,7 @@ if __name__ == "__main__":
         load_if_exists=True,  
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=1000),
     )
-    study.optimize(objective, n_trials=N_TRIALS)
+    study.optimize(objective, n_trials=N_TRIALS, catch=(ValueError, FloatingPointError))
     print("\n=== best trial ===")
     print("score :", study.best_value)
     print("params:", study.best_params)
