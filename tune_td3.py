@@ -53,17 +53,17 @@ def objective(trial):
 if __name__ == "__main__":
     print("new code running")
     study = optuna.create_study(
-        study_name="td3_s2",
-        storage="sqlite:///tune_td3_s2.db",  
+        study_name="td3_s3",
+        storage="sqlite:///tune_td3_s3.db",  
         direction="minimize",
         load_if_exists=True,
-        pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
+        pruner=optuna.pruners.MedianPruner(n_warmup_steps=1000),
     )
     study.optimize(objective, n_trials=N_TRIALS)
     print("\n=== best trial ===")
     print("score :", study.best_value)
     print("params:", study.best_params)
     print("metric2 (best trial):", study.best_trial.user_attrs)
-    with open("best_td3.json", "w") as f:
+    with open("best_td3_new.json", "w") as f:
         json.dump(study.best_params, f, indent=2)
     print("saved -> best_td3_new.json")

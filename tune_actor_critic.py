@@ -54,9 +54,9 @@ if __name__ == "__main__":
     print("new code running!")
     study = optuna.create_study(
         study_name="ac_session2",
-        storage="sqlite:///tune_ac_s2.db",  
+        storage="sqlite:///tune_ac_s3.db",  
         direction="minimize",
-        pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
+        pruner=optuna.pruners.MedianPruner(n_warmup_steps=1000),
     )
     study.optimize(objective, n_trials=N_TRIALS)
     print("\n=== best trial ===")
