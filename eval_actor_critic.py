@@ -7,11 +7,11 @@ after every seed, so partial progress survives interruption.
 """
 import json
 import numpy as np
-from actor_critic import train
+from stoch_actor_critic import train
 
 METHOD       = "Actor-Critic"
-CFG_PATH     = "best_actor_critic.json"
-OUT_PATH     = "eval_actor_critic_results.json"
+CFG_PATH     = "new_best_actor_critic.json"
+OUT_PATH     = "new_eval_actor_critic_results.json"
 EVAL_SEEDS   = range(10)
 MAX_EPISODES = 5000
 
