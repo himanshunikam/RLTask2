@@ -16,9 +16,13 @@ This produces `main.pdf`. Alternatively: `latexmk -pdf main.tex`.
 
 ## Editing notes
 
-- Font is Helvetica (Arial-like sans-serif) via `helvet` + `\sfdefault`.
-- Results come from the seeds-0-9 evaluation (`eval_*_results.json`). Three tables:
-  Table 2 = per-method averages over each method's solved seeds; Table 3 = fair
-  comparison on the seeds all three solved (2,5,7,9); Table 4 = per-seed detail.
+- Styled to match the Task 1 report: serif font (`lmodern`), blue section headings
+  (`secblue` via `titlesec`), grey title block with Matrikelnummer.
+- Covers the three submitted methods: stochastic Actor-Critic, DDPG, TD3.
+- Results come from the seeds-0-9 evaluation (`eval_*_results.json`). DDPG and TD3
+  are filled in; the stochastic Actor-Critic rows say "offen" and need updating once
+  its evaluation finishes (Table 1 hyperparameters, Table 2 results, and optionally a
+  third column in Table 3 per-seed).
+- Section 9 (Quellen) is intentionally empty and needs to be filled in.
 - To add plots (learning curve / trajectory), drop the image into `report/` and
   uncomment the `figure` block near the end of the Ergebnisse section.

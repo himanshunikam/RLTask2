@@ -4,288 +4,296 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[ngerman]{babel}
-\usepackage{helvet}                     % Arial-ähnliche serifenlose Schrift
-\renewcommand{\familydefault}{\sfdefault}
+\usepackage{lmodern}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{geometry}
-\geometry{margin=2.2cm}
+\geometry{margin=2.4cm}
+\usepackage{xcolor}
+\usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{parskip}
 
+\definecolor{secblue}{RGB}{31,73,125}
+\titleformat{\section}{\normalfont\large\bfseries\color{secblue}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.6em}{}
 \captionsetup{font=small,labelfont=bf}
 
-% ------------------------------------------------------------------ Titel
-\title{\vspace{-1.2cm}\textbf{Lösen der AsteroidStatic-Umgebung mit tiefem\\ bestärkendem Lernen}}
-\author{Himanshu Mohan Nikam}
-\date{Aufgabe 2 -- Deep Reinforcement Learning\\
-      Prof.\ Thomas Nierhoff, OTH Amberg-Weiden \\[2pt] \today}
-
 \begin{document}
-\maketitle
-\vspace{-0.6cm}
+
+% ------------------------------------------------------------------ Titel
+\begin{center}
+{\LARGE\bfseries Lösung von AsteroidStatic mit Deep Reinforcement Learning}
+\end{center}
+\vspace{0.2cm}
+{\color{gray}
+Task 2 \textendash{} Deep Reinforcement Learning (Prof.\ Thomas Nierhoff, OTH Amberg-Weiden)\\
+Autor: Himanshu Mohan Nikam\\
+Matrikelnummer: 25901848
+}
+\vspace{0.4cm}
 
 % ================================================================== 1
-\section{Einleitung und Aufgabenstellung}
-Dieses Projekt trainiert Agenten des bestärkenden Lernens (Reinforcement Learning),
-um die bereitgestellte \emph{AsteroidStatic}-Umgebung zu lösen. Der Agent ist ein
-Massepunkt (Raumschiff) in einer 2D-Arena mit 25 kreisförmigen Asteroiden. Er wird
-durch eine kontinuierliche Beschleunigung gesteuert und driftet aufgrund seiner
-Trägheit. Eine Episode ist erfolgreich, wenn das Raumschiff dem Ziel bis auf $0{,}30$
-nahekommt, und scheitert bei Kollision mit einem Asteroiden, beim Verlassen der Arena
-oder beim Erreichen des Zeitlimits von 500 Schritten.
+\section{Projektüberblick}
+Das Projekt besteht aus mehreren eigenen Dateien. Die vorgegebene Datei \texttt{asteroid.py}
+wurde nicht verändert:
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \texttt{stoch\_actor\_critic.py} \textendash{} stochastischer Actor-Critic (One-step, on-policy).
+  \item \texttt{DDPG.py} \textendash{} Deep Deterministic Policy Gradient.
+  \item \texttt{TD3.py} \textendash{} Twin Delayed DDPG.
+  \item \texttt{tune\_stochastic\_ac.py}, \texttt{tune\_ddpg.py}, \texttt{tune\_td3.py} \textendash{}
+        Optuna-Tuning für die jeweilige Methode.
+  \item \texttt{eval\_*.py} sowie die zugehörigen Tuning-Logs, Optuna-Datenbanken
+        (\texttt{*.db}), die besten Konfigurationen (\texttt{best\_*.json}) und die
+        Auswertungsergebnisse (\texttt{eval\_*\_results.json}).
+\end{itemize}
 
-\textbf{Beobachtung:} $\text{obs}=[x,y,v_x,v_y]$ (nur Position und Geschwindigkeit --
-Ziel- und Asteroidenpositionen sind \emph{nicht} beobachtbar). \textbf{Aktion:}
-$a=[a_x,a_y]$, jeweils ein reeller Wert in $[-1,1]$. \textbf{Belohnung} (bereits von der
-Umgebung geformt): $+0{,}5 \times$ Fortschritt zum Ziel pro Schritt, $+10$ für das
-Erreichen des Ziels und $-100$ für eine Kollision. Der Agent lernt ausschließlich aus
-Beobachtungen, Belohnungen und Info; er darf weder Hindernispositionen auslesen noch
-gegen die Geometrie planen. Alle bereitgestellten Dateien werden unverändert verwendet,
-und nur der Zufallskeim (Seed) wird variiert, um verschiedene Arenen zu erhalten.
-
-Zwei bewertete Zielgrößen werden gemessen, jeweils gemittelt über zehn Arenen
-(Seeds 0--9): \textbf{(1) Stichprobeneffizienz} -- die geringste Anzahl an
-Umgebungsaufrufen bis zum erstmaligen Erreichen des Ziels (Metrik~1); und
-\textbf{(2) Geschwindigkeit} -- die geringste Anzahl an Zeitschritten bis zum Ziel
-nach dem Training (Metrik~2).
+Gemessen werden die beiden geforderten Zielgrößen, jeweils gemittelt über zehn Arenen
+(Seeds 0 bis 9): erstens die Anzahl der Umgebungsaufrufe bis zum erstmaligen Erreichen des
+Ziels (Metrik 1, Stichprobeneffizienz) und zweitens die kürzeste erfolgreiche Episodenlänge
+(Metrik 2, Geschwindigkeit). Zusätzlich wird die Anzahl der Aufrufe festgehalten, bei der
+diese kürzeste Episode zuerst auftrat. Für das Tuning werden andere Seeds (115 und 119)
+benutzt als für die finale Auswertung.
 
 % ================================================================== 2
 \section{Ansätze}
-Da es sich um eine Navigationsaufgabe mit kontinuierlicher Regelung handelt, wurden
-zwei komplementäre Algorithmenfamilien untersucht und innerhalb jeder eine Progression
-implementiert.
+Die Umgebung besitzt einen kontinuierlichen Aktionsraum, weshalb alle drei umgesetzten
+Verfahren direkt auf dem Vektor $a=[a_x,a_y]$ arbeiten. Untersucht wurden ein on-policy
+Verfahren und zwei off-policy Verfahren.
 
-\subsection{Wertbasierte Methoden (DQN-Familie)}
-Zunächst wurde der DQN-Ansatz implementiert und erprobt. Deep-Q-Netze lernen einen Wert
-$Q(s,a)$ über eine endliche Aktionsmenge; daher wird die kontinuierliche Aktion in
-9 Bang-Bang-Aktionen diskretisiert -- alle Kombinationen von $\{-1,0,+1\}$ für $a_x$ und
-$a_y$. Vollschub-Aktionen sind zudem der schnellste Weg, eine Masse zu bewegen, was der
-Geschwindigkeitsmetrik zugutekommt. Ausgehend von DQN wurden die Standardverbesserungen
-ergänzt: \emph{Double DQN} (DDQN), das Aktionsauswahl und -bewertung entkoppelt, um die
-Wertüberschätzung zu verringern, sowie \emph{Dueling DDQN}, das das Netz in einen
-Zustandswert-Strom $V(s)$ und einen Vorteils-Strom $A(s,a)$ aufteilt. Alle drei nutzen
-Experience Replay, ein Zielnetz und $\varepsilon$-greedy-Exploration.
+\subsection{On-policy: Stochastischer Actor-Critic (in stoch\_actor\_critic.py)}
+Dieses Verfahren folgt der Vorlesungsformulierung des One-step Actor-Critic. Der Actor ist
+eine stochastische Gauß-Politik $\pi(a|s,\theta)$, die Mittelwert und Streuung ausgibt; die
+Aktion wird aus dieser Verteilung gezogen. Der Critic schätzt den Zustandswert $V(s,w)$.
+Beide werden mit demselben TD-Fehler
+$\delta = R + \gamma \hat V(S',w) - \hat V(S,w)$ aktualisiert, der Critic über $\delta^2$ und
+der Actor über $-\log \pi(a|s)\,\delta$. Zusätzlich wird ein Entropiebonus addiert, der die
+Streuung der Politik offen hält, sowie der Faktor $I \leftarrow \gamma I$ aus der
+Vorlesungsfolie verwendet. Die Exploration entsteht hier ausschließlich durch das Ziehen aus
+der Verteilung.
 
-\subsection{Methoden der kontinuierlichen Regelung}
-Die zweite Familie wirkt direkt auf die kontinuierliche Aktion und vermeidet die
-Diskretisierung. Ein deterministischer Actor $\mu(s)$ schlägt eine Aktion vor, ein
-Critic $Q(s,a)$ bewertet sie. Es wurde eine Progression aus drei Verfahren implementiert:
-ein Basis-\emph{Actor-Critic}; \emph{DDPG}, das dieses durch weiche (Polyak-)
-Zielaktualisierungen und zeitlich korreliertes Ornstein-Uhlenbeck-Rauschen stabilisiert;
-und \emph{TD3}, das zwei Critics mit geclipptem Minimum-Ziel (gegen Überschätzung),
-Zielstrategie-Glättung (\emph{target policy smoothing}) und verzögerte Actor-Updates
-ergänzt. Die kontinuierliche Regelung erlaubt eine feine, abgestufte Steuerung --
-einschließlich sanftem Bremsen -- die die festen Vollschub-Aktionen nicht ausdrücken
-können, und erzeugt daher tendenziell kürzere, glattere Wege.
+\subsection{Off-policy: DDPG (in DDPG.py)}
+DDPG ersetzt die stochastische Politik durch einen deterministischen Actor $\mu(s)$ und den
+Zustandswert durch einen Aktionswert $Q(s,a)$. Dadurch wird das Verfahren off-policy und kann
+einen Replay Buffer nutzen, was für die Stichprobeneffizienz wichtig ist. Der Actor wird über
+den deterministischen Policy-Gradienten trainiert, also in Richtung steigender $Q$-Werte.
+Stabilisiert wird das Ganze durch Zielnetze mit weichen Polyak-Updates und durch zeitlich
+korreliertes Ornstein-Uhlenbeck-Rauschen, das die Exploration liefert.
 
-\subsection{Betrachtete Methoden}
-Ebenfalls betrachtet, aber nicht im Fokus: \emph{Deep SARSA}, ein on-policy-Verfahren,
-das in der Nähe der hohen $-100$-Kollisionsstrafe von Natur aus risikoscheuer ist; sowie
-\emph{Soft Actor-Critic} (SAC) und \emph{PPO} als alternative Verfahren der
-kontinuierlichen Regelung mit stärkerer, entropiegetriebener Exploration.
+\subsection{Off-policy: TD3 (in TD3.py)}
+TD3 erweitert DDPG um drei Punkte. Erstens werden zwei Critics gelernt und im Ziel das
+Minimum beider verwendet, was die typische Überschätzung der Aktionswerte dämpft. Zweitens
+wird auf die Zielaktion ein begrenztes Rauschen addiert (Target Policy Smoothing), damit der
+Critic keine scharfen Ausreißer im $Q$-Verlauf ausnutzen kann. Drittens wird der Actor
+seltener aktualisiert als die Critics, damit die Wertschätzung dem Actor vorauseilt.
+
+\subsection{Weitere erprobte Ansätze}
+Vor den drei eingereichten Verfahren wurde auch die DQN-Familie umgesetzt und getestet
+(DQN, Double DQN und Dueling DDQN). Da DQN einen endlichen Aktionsraum benötigt, wurde die
+Aktion dafür in neun Bang-Bang-Aktionen diskretisiert, also alle Kombinationen aus
+$\{-1,0,+1\}$ für $a_x$ und $a_y$. Dieser Ansatz löste einzelne Arenen zuverlässig, ist aber
+nicht Teil der Abgabe, da der Schwerpunkt auf den Verfahren für kontinuierliche Aktionen
+liegt.
 
 % ================================================================== 3
-\section{Wichtige Implementierungstechniken}
-Mehrere praktische Maßnahmen waren entscheidend, damit die Verfahren in dieser
-hindernisdichten Umgebung mit seltener Zielbelohnung überhaupt lernen:
-\begin{itemize}\setlength\itemsep{2pt}
-  \item \textbf{Eingangsnormalisierung.} Positionen und Geschwindigkeiten werden anhand
-        der bekannten Umgebungsgrenzen auf einen vergleichbaren Bereich skaliert. Dies ist
-        eine reine Eingangsskalierung (keine Analyse der Umgebung) und trug am stärksten
-        zu stabilem Training bei.
-  \item \textbf{Belohnungsbehandlung.} Die $-100$-Kollisionsstrafe dominiert den kleinen
-        $+0{,}5$-Fortschrittsterm um rund zwei Größenordnungen, was die gelernten
-        Wertschätzungen kollabieren lässt. Ein asymmetrisches Belohnungs-Clipping begrenzt
-        die Kollisionsstrafe nach unten, hält aber den $+10$-Zielbonus groß und
-        aussagekräftig, sodass die seltenen erfolgreichen Übergänge das Lernen stark
-        beeinflussen. Diese bewusste Umformung wird als Entwurfsentscheidung vermerkt.
-  \item \textbf{Exploration.} Die Aufgabe ist explorationsschwer: Ein rein zufälliger
-        Agent erreicht das Ziel nur in etwa $0{,}2\,\%$ der Episoden und auf mehreren
-        Arenen nie, da das Ziel hinter dichten Hindernissen mindestens drei Einheiten
-        entfernt liegt. Daher wird die Exploration stark und dauerhaft gehalten --
-        Injektion von Zufallsaktionen mit voller Magnitude für die wertbasierten Agenten
-        und korreliertes Ornstein-Uhlenbeck-Rauschen für die kontinuierlichen Agenten --,
-        damit der Agent das Ziel weiter entdeckt, statt in eine triviale ``Nichtstun''-
-        oder ``Flucht in den freien Raum''-Strategie zu kollabieren.
-  \item \textbf{Stabilität.} Gradienten-Clipping, Zielnetze und eine Replay-Aufwärmphase
-        wurden durchgängig eingesetzt.
+\section{Wichtige Techniken}
+\begin{itemize}\setlength\itemsep{3pt}
+  \item \textbf{Eingangsnormalisierung.} Positionen und Geschwindigkeiten werden anhand der
+        bekannten Grenzen der Umgebung auf einen vergleichbaren Bereich skaliert. Es handelt
+        sich um eine reine Skalierung der Eingänge und nicht um eine Analyse der Umgebung. Ohne
+        diesen Schritt war keines der Verfahren stabil trainierbar.
+  \item \textbf{Asymmetrisches Reward-Clipping.} Die Kollisionsstrafe von $-100$ ist rund zwei
+        Größenordnungen größer als der Fortschrittsterm von $0{,}5 \cdot$ Fortschritt. Dadurch
+        kollabieren die gelernten Werte auf einen nahezu konstanten negativen Wert, und der
+        Agent kann gute von schlechten Aktionen nicht mehr unterscheiden. Die Strafe wird
+        deshalb nach unten begrenzt, während der Zielbonus von $+10$ unverändert groß bleibt.
+        So bleiben die seltenen erfolgreichen Übergänge das dominierende Signal.
+  \item \textbf{Exploration.} Ein rein zufälliger Agent erreicht das Ziel nur in etwa
+        $0{,}2\,\%$ der Episoden und auf mehreren Arenen überhaupt nicht. Die Exploration muss
+        daher dauerhaft stark bleiben. Beim stochastischen Actor-Critic übernimmt das der
+        Entropiebonus, bei DDPG und TD3 das korrelierte Ornstein-Uhlenbeck-Rauschen.
+  \item \textbf{Begrenzung der Streuung.} Die Streuung der Gauß-Politik wird über
+        \texttt{log\_std} gelernt und auf einen festen Bereich begrenzt. Ohne diese Begrenzung
+        wächst sie durch den Entropiebonus unbegrenzt an, bis die Verteilung ungültig wird
+        (siehe Abschnitt 6).
+  \item \textbf{Stabilität.} Zusätzlich werden Gradienten begrenzt, Zielnetze verwendet und der
+        Replay Buffer vor dem ersten Update mit zufälligen Übergängen gefüllt.
 \end{itemize}
 
 % ================================================================== 4
-\section{Experimenteller Aufbau}
-Alle Agenten sind in PyTorch implementiert und nutzen die Standardeinstellungen der
-Umgebung; nur der Seed wird geändert. Die Hyperparameter werden mit \emph{Optuna}
-optimiert. Gemäß der Aufgabenregel erfolgt das Tuning auf Seeds, die von den
-Evaluations-Seeds disjunkt sind: Aus den Kandidaten 100--119 wurden die beiden am besten
-lösbaren (Seeds 115 und 119, auf denen das Ziel zumindest gelegentlich erreichbar ist)
-für die Suche verwendet; die Endergebnisse werden auf den Seeds 0--9 berichtet. Die
-Zielfunktion minimiert die Aufrufe bis zur ersten Lösung, mit einer abstandsbasierten
-Rückfalloption, sodass Konfigurationen, die im Episodenbudget nicht lösen, dennoch nach
-ihrer Annäherung an das Ziel bewertet werden. Je Lauf werden Metrik~1, die kürzeste
-erfolgreiche Episodenlänge (Metrik~2) sowie die zu dieser kürzesten Episode gehörenden
-Aufrufe erfasst.
+\section{Hyperparameter Tuning}
+Die Hyperparameter werden mit Optuna gesucht, für jede Methode in einem eigenen Skript und
+einer eigenen SQLite-Datenbank, sodass unterbrochene Läufe fortgesetzt werden können. Getunt
+werden unter anderem die Lernraten von Actor und Critic, $\gamma$, die Netzgröße sowie die
+methodenspezifischen Parameter, also $\tau$ und die Rauschstärke bei DDPG und TD3
+beziehungsweise der Entropiekoeffizient beim stochastischen Actor-Critic.
 
-Tabelle~\ref{tab:hyper} fasst die besten von Optuna gefundenen Konfigurationen zusammen.
+Die Tuning-Seeds sind von den Auswertungs-Seeds getrennt. Um geeignete Tuning-Seeds zu finden,
+wurden die Kandidaten 100 bis 119 zunächst mit einem Zufallsagenten vermessen. Auf den meisten
+davon wird das Ziel nie zufällig erreicht, sodass das Tuning dort kein verwertbares Signal
+liefert. Gewählt wurden deshalb die Seeds 115 und 119, auf denen der Zufallsagent das Ziel
+zumindest gelegentlich erreicht. Die Zielfunktion minimiert die Aufrufe bis zur ersten Lösung;
+Konfigurationen, die innerhalb des Episodenbudgets nicht lösen, werden ersatzweise nach ihrem
+geringsten Abstand zum Ziel bewertet, damit die Suche auch dann eine Richtung hat.
 
 \begin{table}[h]
 \centering
 \small
-\caption{Getunte Hyperparameter (beste Optuna-Konfiguration je Verfahren).}
+\caption{Beste von Optuna gefundene Konfiguration je Verfahren.}
 \label{tab:hyper}
 \begin{tabular}{lccc}
 \toprule
-Hyperparameter & Actor-Critic & DDPG & TD3 \\
+Hyperparameter & Stoch.\ Actor-Critic & DDPG & TD3 \\
 \midrule
-\texttt{actor\_lr}          & $4{,}3\!\cdot\!10^{-5}$ & $1{,}7\!\cdot\!10^{-5}$ & $1{,}4\!\cdot\!10^{-4}$ \\
-\texttt{critic\_lr}         & $1{,}3\!\cdot\!10^{-4}$ & $4{,}8\!\cdot\!10^{-4}$ & $1{,}9\!\cdot\!10^{-3}$ \\
-$\gamma$                    & $0{,}979$ & $0{,}992$ & $0{,}962$ \\
-Batch-Größe                 & $64$ & $128$ & $128$ \\
-Hidden-Größe                & $256$ & $256$ & $256$ \\
-$\tau$ (Polyak)             & -- & $1{,}8\!\cdot\!10^{-3}$ & $8{,}0\!\cdot\!10^{-3}$ \\
-Explorationsrauschen        & $\sigma_{\text{Gauss}}=0{,}17$ & $\sigma_{\text{OU}}=0{,}37$ & $\sigma_{\text{OU}}=0{,}32$ \\
-$\varepsilon_{\min}$ / -zerfall & $0{,}22$ / $0{,}995$ & -- & -- \\
-\texttt{target\_update\_freq} & $899$ & -- & -- \\
-policy\_noise / noise\_clip & -- & -- & $0{,}34$ / $0{,}50$ \\
-policy\_delay               & -- & -- & $1$ \\
+Actor-Lernrate       & offen & $1{,}7\!\cdot\!10^{-5}$ & $1{,}4\!\cdot\!10^{-4}$ \\
+Critic-Lernrate      & offen & $4{,}8\!\cdot\!10^{-4}$ & $1{,}9\!\cdot\!10^{-3}$ \\
+$\gamma$             & offen & $0{,}992$ & $0{,}962$ \\
+$\tau$ (Polyak)      & --    & $1{,}8\!\cdot\!10^{-3}$ & $8{,}0\!\cdot\!10^{-3}$ \\
+Rauschstärke         & offen & $\sigma_{\text{OU}}=0{,}37$ & $\sigma_{\text{OU}}=0{,}32$ \\
+Target Policy Smoothing & -- & -- & $0{,}34$ / $0{,}50$ \\
+Policy Delay         & --    & -- & $1$ \\
+Batch-Größe          & offen & $128$ & $128$ \\
+Netzgröße            & offen & $256$ & $256$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 % ================================================================== 5
 \section{Ergebnisse}
-Jedes Verfahren wurde mit seiner besten Konfiguration auf den Seeds 0--9 evaluiert
-(bis zu 5000 Episoden je Seed). Tabelle~\ref{tab:main} zeigt die Robustheit (gelöste
-Seeds) und die über die \emph{jeweils gelösten} Seeds gemittelten Metriken.
+Jedes Verfahren wird mit seiner besten Konfiguration auf den Seeds 0 bis 9 ausgewertet, mit
+einem Budget von 5000 Episoden je Seed. Tabelle~\ref{tab:main} zeigt, wie viele Arenen gelöst
+wurden und die Mittelwerte über die jeweils gelösten Seeds. Die Auswertung des stochastischen
+Actor-Critic steht noch aus und wird nachgetragen.
 
 \begin{table}[h]
 \centering
 \small
-\caption{Hauptergebnisse, gemittelt über die je Verfahren gelösten Seeds.}
+\caption{Ergebnisse auf den Auswertungs-Seeds 0 bis 9, gemittelt über die jeweils gelösten Seeds.}
 \label{tab:main}
 \begin{tabular}{lcccc}
 \toprule
-Verfahren & Gelöste Seeds & Ø Metrik~1 & Ø Metrik~2 & Ø zugeh.\ Aufrufe \\
-          &               & (Aufrufe bis Lösung)   & (Schritte)             &  \\
+Verfahren & Gelöste Seeds & Metrik 1 & Metrik 2 & Zugehörige Aufrufe \\
 \midrule
-Actor-Critic & 6/10  & 80.847 & 26{,}0 & 130.101 \\
-DDPG         & 5/10  & \phantom{0}4.473 & 24{,}2 & \phantom{0}88.761 \\
-TD3          & \textbf{10/10} & 89.295 & 37{,}9 & 147.919 \\
+Stoch.\ Actor-Critic & offen          & offen  & offen  & offen \\
+DDPG                 & 5/10           & 4.473  & 24{,}2 & 88.761 \\
+TD3                  & \textbf{10/10} & 89.295 & 37{,}9 & 147.919 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Da jedes Verfahren nur über die von ihm gelösten Seeds gemittelt wird, sind diese
-Mittelwerte \emph{nicht direkt vergleichbar}: TD3 löst als einziges auch die beiden
-schwierigsten Seeds (4 und 8) mit langen Wegen, was seine Mittelwerte erhöht; DDPGs
-niedrige Metrik~1 beruht teils darauf, dass es nur fünf, eher leichte Seeds löst.
-Tabelle~\ref{tab:common} vergleicht die Verfahren daher fair auf der gemeinsamen
-Teilmenge der von allen dreien gelösten Seeds ($2,5,7,9$).
+Die Mittelwerte beziehen sich jeweils nur auf die von einem Verfahren gelösten Seeds und sind
+deshalb nicht unmittelbar vergleichbar. TD3 löst als einziges Verfahren auch die beiden
+schwersten Arenen (Seeds 4 und 8), die lange Wege von 83 beziehungsweise 92 Schritten
+erfordern; genau diese beiden Läufe heben die Mittelwerte von TD3 deutlich an. DDPG löst nur
+fünf, eher leichte Arenen, was seinen niedrigen Wert bei Metrik 1 erklärt. Tabelle
+\ref{tab:perseed} zeigt daher die Einzelergebnisse.
 
 \begin{table}[h]
 \centering
 \small
-\caption{Fairer Vergleich auf den von allen Verfahren gelösten Seeds (2, 5, 7, 9).}
-\label{tab:common}
-\begin{tabular}{lccc}
-\toprule
-Verfahren & Ø Metrik~1 & Ø Metrik~2 & Ø zugeh.\ Aufrufe \\
-\midrule
-Actor-Critic & 24.304 & 24{,}8 & \phantom{0}51.619 \\
-DDPG         & \phantom{0}4.449 & 24{,}8 & 105.190 \\
-TD3          & \textbf{\phantom{0}4.667} & \textbf{24{,}0} & \textbf{\phantom{0}35.535} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Tabelle~\ref{tab:perseed} listet die Einzelergebnisse je Seed (``--'' = innerhalb des
-Budgets nicht gelöst).
-
-\begin{table}[h]
-\centering
-\small
-\caption{Ergebnisse je Seed: Metrik~1 (Aufrufe bis Lösung) / Metrik~2 (Schritte).}
+\caption{Ergebnisse je Seed. Ein Strich bedeutet, dass die Arena im Budget nicht gelöst wurde.}
 \label{tab:perseed}
-\begin{tabular}{ccccccc}
+\begin{tabular}{ccccc}
 \toprule
-Seed & \multicolumn{2}{c}{Actor-Critic} & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
-     & Metrik~1 & M2 & Metrik~1 & M2 & Metrik~1 & M2 \\
+Seed & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
+     & Metrik 1 & Metrik 2 & Metrik 1 & Metrik 2 \\
 \midrule
-0 & --       & -- & --       & -- & 121.118 & 26 \\
-1 & 13.159   & 25 & --       & -- & \phantom{0}32.362 & 23 \\
-2 & 75.105   & 26 & \phantom{00}1.235 & 27 & \phantom{0}10.022 & 25 \\
-3 & --       & -- & --       & -- & 250.901 & 35 \\
-4 & --       & -- & --       & -- & 144.963 & 83 \\
-5 & 10.166   & 27 & \phantom{00}3.185 & 26 & \phantom{00}3.192 & 25 \\
-6 & 374.705  & 32 & --       & -- & \phantom{0}45.808 & 24 \\
-7 & \phantom{0}6.738 & 23 & \phantom{00}7.228 & 23 & \phantom{00}3.151 & 23 \\
-8 & --       & -- & \phantom{00}4.573 & 22 & 279.128 & 92 \\
-9 & \phantom{0}5.207 & 23 & \phantom{00}6.146 & 23 & \phantom{00}2.301 & 23 \\
+0 & --    & -- & 121.118 & 26 \\
+1 & --    & -- & 32.362  & 23 \\
+2 & 1.235 & 27 & 10.022  & 25 \\
+3 & --    & -- & 250.901 & 35 \\
+4 & --    & -- & 144.963 & 83 \\
+5 & 3.185 & 26 & 3.192   & 25 \\
+6 & --    & -- & 45.808  & 24 \\
+7 & 7.228 & 23 & 3.151   & 23 \\
+8 & 4.573 & 22 & 279.128 & 92 \\
+9 & 6.146 & 23 & 2.301   & 23 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-% Platzhalter für Abbildungen -- nach dem Erzeugen der Plots einkommentieren:
+Betrachtet man nur die fünf Seeds, die beide Verfahren lösen (2, 5, 7, 8 und 9), so liegt DDPG
+bei Metrik 1 im Mittel bei 4.473 Aufrufen und TD3 bei 59.559. Ohne den teuren Seed 8 sinkt TD3
+allerdings auf 4.667 Aufrufe und liegt damit gleichauf. Bei Metrik 2 sind beide Verfahren auf
+diesen Seeds nahezu identisch.
+
+% Platzhalter für Abbildungen, nach dem Erzeugen der Plots einkommentieren:
 % \begin{figure}[h]\centering
 %   \includegraphics[width=0.8\linewidth]{lernkurve.png}
-%   \caption{Lernkurve (Episodenlänge und Erfolgsrate über der Anzahl der Aufrufe).}
+%   \caption{Lernkurve: Episodenlänge und Erfolgsrate über der Anzahl der Aufrufe.}
 % \end{figure}
 
 % ================================================================== 6
-\section{Diskussion}
-Die entscheidende Schwierigkeit ist die Exploration, nicht die Lernregel. Da das Ziel
-hinter einem dichten Hindernisfeld liegt, kann der geradlinige Fortschrittsterm den
-Agenten aktiv in die Asteroiden direkt vor dem Ziel locken; Zustände näher am Ziel
-tragen dann ein höheres Kollisionsrisiko und einen niedrigeren Wert, und ein Agent kann
-rational lernen, in den freien Raum zu fliehen oder -- bei der deterministischen
-kontinuierlichen Strategie -- eine nahezu null Aktion (``Nichtstun'') auszugeben und
-bis zum Zeitlimit zu überleben. Dies zu überwinden erforderte eine Exploration, die
-stark genug ist, das Ziel oft genug tatsächlich zu erreichen.
+\section{Fehlgeschlagene Versuche}
 
-Über alle Seeds war \textbf{TD3 am robustesten} und löste als einziges alle zehn Arenen.
-Auf der fair vergleichbaren gemeinsamen Teilmenge (Tabelle~\ref{tab:common}) sind
-\textbf{DDPG und TD3 deutlich stichprobeneffizienter als Actor-Critic}
-($\approx 4.500$ gegenüber $\approx 24.300$ Aufrufen bis zur Lösung), und TD3 liefert
-zugleich die kürzesten Wege (Metrik~2 $=24{,}0$) und die wenigsten zugehörigen Aufrufe.
-Die erhöhten Gesamtmittelwerte von TD3 in Tabelle~\ref{tab:main} stammen ausschließlich
-von den schweren Seeds 4 und 8, die lange Wege (83 bzw.\ 92 Schritte) erfordern -- der
-Preis dafür, dass diese überhaupt gelöst werden.
+\subsection{Deterministischer Actor-Critic}
+Zuerst wurde ein deterministischer Actor-Critic umgesetzt, also im Kern DDPG ohne dessen
+Stabilisierungen. Dieser kollabierte zuverlässig auf die Nullaktion: Der Actor gab eine
+Beschleunigung nahe null aus, das Raumschiff blieb am Startpunkt stehen und überlebte bis zum
+Zeitlimit mit einer Belohnung von etwa null. Das ist aus Sicht des Agenten rational, weil
+Nichtstun keine Kollisionsstrafe kostet, während jeder Versuch, das Ziel zu erreichen, im
+Hindernisfeld endet. Erst eine deutlich verstärkte Exploration brachte ihn aus diesem lokalen
+Optimum heraus. Für die Abgabe wurde er durch den stochastischen Actor-Critic ersetzt, der
+näher an der Vorlesungsformulierung liegt.
 
-Zwei Dinge, die \emph{nicht} funktionierten, sind berichtenswert. Symmetrisches
-Belohnungs-Clipping auf $[-1,1]$ ließ die Kollisionsstrafe groß genug, um alle
-Wertschätzungen kollabieren zu lassen. Und schwaches Gauß-Rauschen um eine bereits
-kollabierte deterministische Strategie zittert nur lokal und reicht nie weit genug, um
-das Ziel zu finden; starke, korrelierte oder vollmagnitudige Exploration war notwendig.
-Der erprobte DQN-Ansatz konnte einzelne Arenen zuverlässig lösen und profitierte von der
-vollmagnitudigen $\varepsilon$-greedy-Exploration über die diskreten Vollschub-Aktionen.
+\subsection{Symmetrisches Reward-Clipping}
+Ein erster Versuch begrenzte die Belohnung symmetrisch auf $[-1,1]$. Damit wurde zwar die
+Kollisionsstrafe gedämpft, gleichzeitig aber auch der Zielbonus auf denselben Betrag
+gestaucht. Da das Ziel nur äußerst selten erreicht wird, verlor es dadurch jede Sonderstellung
+gegenüber einer Kollision, und die Wertschätzungen kollabierten weiterhin. Erst die
+asymmetrische Variante aus Abschnitt 3 löste das Problem.
+
+\subsection{Zu weite Suchbereiche beim Tuning}
+Ein Tuning-Lauf des stochastischen Actor-Critic brach nach zwei Trials vollständig ab. Die
+Suchbereiche für die Lernraten waren zu weit gewählt, sodass Optuna Werte bis 0,245 für den
+Critic vorschlug. Bei solchen Lernraten divergiert der TD-Fehler, und der Entropiebonus treibt
+die gelernte Streuung der Politik unbegrenzt nach oben, bis sie numerisch überläuft und die
+Normalverteilung ungültig wird. Da Optuna Ausnahmen standardmäßig weiterreicht, beendete
+dieser eine Trial die gesamte Studie. Abhilfe schaffen engere Suchbereiche, die Begrenzung von
+\texttt{log\_std} und das Abfangen fehlgeschlagener Trials, damit die Suche weiterläuft.
+
+\subsection{Schwache Exploration}
+Kleines Gauß-Rauschen um eine bereits kollabierte deterministische Politik reicht nicht aus.
+Der Agent zittert dann nur lokal um den Startpunkt und legt nie genug Strecke zurück, um das
+Ziel überhaupt zu finden. Notwendig war entweder korreliertes Rauschen oder das Einstreuen von
+Zufallsaktionen mit voller Magnitude.
 
 % ================================================================== 7
-\section{Fazit}
-Es wurden zwei Familien tiefer RL-Agenten auf der AsteroidStatic-Aufgabe implementiert
-und verglichen -- eine wertbasierte DQN/DDQN/Dueling-DDQN-Progression und eine
-kontinuierliche Actor-Critic/DDPG/TD3-Progression -- zusammen mit den Explorations- und
-Belohnungsformungstechniken, die zum Lernen in dieser explorationsschweren Umgebung
-nötig waren. \textbf{TD3 erwies sich als das robusteste Verfahren} (10/10 gelöste Arenen)
-und war auf vergleichbaren Seeds sowohl stichproben- als auch wegeffizient; DDPG war auf
-den leichteren Arenen ebenfalls sehr stichprobeneffizient, aber weniger robust, und der
-Basis-Actor-Critic war das schwächste der drei kontinuierlichen Verfahren.
+\section{Diskussion}
+Die größte Schwierigkeit dieser Aufgabe liegt in der Exploration und nicht in der Lernregel.
+Das Ziel liegt hinter einem dichten Hindernisfeld, und der Fortschrittsterm der Belohnung zeigt
+geradlinig darauf zu. Zustände näher am Ziel tragen dadurch ein höheres Kollisionsrisiko und
+einen niedrigeren Wert, sodass ein Agent es rational vermeidet, sich dem Ziel zu nähern. Genau
+das erzeugt die beiden beobachteten lokalen Optima, nämlich die Flucht in den freien Raum und
+das Verharren am Startpunkt.
 
-% ================================================================== Literatur
-\begin{thebibliography}{9}
-\small
-\bibitem{dqn} V.\ Mnih et al., \emph{Human-level control through deep reinforcement
-  learning}, Nature 518, 2015.
-\bibitem{ddqn} H.\ van Hasselt, A.\ Guez, D.\ Silver, \emph{Deep Reinforcement Learning
-  with Double Q-learning}, AAAI 2016.
-\bibitem{dueling} Z.\ Wang et al., \emph{Dueling Network Architectures for Deep
-  Reinforcement Learning}, ICML 2016.
-\bibitem{ddpg} T.\ P.\ Lillicrap et al., \emph{Continuous control with deep reinforcement
-  learning} (DDPG), ICLR 2016.
-\bibitem{td3} S.\ Fujimoto, H.\ van Hoof, D.\ Meger, \emph{Addressing Function
-  Approximation Error in Actor-Critic Methods} (TD3), ICML 2018.
-\end{thebibliography}
+Unter den ausgewerteten Verfahren ist TD3 mit Abstand das robusteste und löst als einziges alle
+zehn Arenen. Die drei Erweiterungen gegenüber DDPG wirken hier also genau wie beabsichtigt: Das
+Minimum zweier Critics verhindert, dass der Actor überschätzte Aktionswerte ausnutzt, was gerade
+bei der großen Kollisionsstrafe entscheidend ist. DDPG ist auf den Arenen, die es löst, sehr
+stichprobeneffizient, scheitert aber an den schwereren Layouts. Bemerkenswert ist, dass die
+getunte TD3-Konfiguration einen Policy Delay von eins gewählt hat, die verzögerte Aktualisierung
+des Actors auf den Tuning-Seeds also keinen Vorteil brachte.
+
+Erwartungsgemäß dürfte der stochastische Actor-Critic bei Metrik 1 schlechter abschneiden als
+die beiden off-policy Verfahren, da er jeden Übergang nur einmal verwendet und keinen Replay
+Buffer besitzt. Auf einer Aufgabe, bei der das Ziel so selten erreicht wird, wiegt das schwer,
+weil eine seltene erfolgreiche Episode sofort wieder verworfen wird, statt vielfach
+wiederverwendet zu werden.
+
+% ================================================================== 8
+\section{Fazit}
+Verglichen wurden ein on-policy Verfahren und zwei off-policy Verfahren für kontinuierliche
+Aktionen, zusammen mit den Techniken, die das Lernen in dieser Umgebung überhaupt ermöglichen,
+also Eingangsnormalisierung, asymmetrisches Reward-Clipping und dauerhaft starke Exploration.
+TD3 ist das robusteste Verfahren und löst alle zehn Arenen, während DDPG nur die leichteren
+Layouts bewältigt, dort aber sehr stichprobeneffizient ist. Die Zahlen für den stochastischen
+Actor-Critic werden nach Abschluss seiner Auswertung ergänzt.
+
+% ================================================================== 9
+\section{Quellen}
 
 \end{document}
