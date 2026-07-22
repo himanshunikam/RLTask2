@@ -39,7 +39,7 @@ if __name__ == "__main__":
     print("new code running!")
     study = optuna.create_study(
         study_name="new_ac",
-        storage="sqlite:///new_ac_s3.db",  
+        storage="sqlite:///new_ac_s4.db",  
         load_if_exists=True,
         direction="minimize",
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),
