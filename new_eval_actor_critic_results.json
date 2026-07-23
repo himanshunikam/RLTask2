@@ -1,0 +1,37 @@
+[
+  {
+    "seed": 0,
+    "metric1_calls_to_solve": null,
+    "metric2_shortest_len": null,
+    "metric2_assoc_calls": null,
+    "best_min_dist": 1.7206375622902657
+  },
+  {
+    "seed": 1,
+    "metric1_calls_to_solve": 6030,
+    "metric2_shortest_len": 25,
+    "metric2_assoc_calls": 29290,
+    "best_min_dist": 0.2155996785271498
+  },
+  {
+    "seed": 2,
+    "metric1_calls_to_solve": 2050,
+    "metric2_shortest_len": 25,
+    "metric2_assoc_calls": 38040,
+    "best_min_dist": 0.018850147453228466
+  },
+  {
+    "seed": 3,
+    "metric1_calls_to_solve": null,
+    "metric2_shortest_len": null,
+    "metric2_assoc_calls": null,
+    "best_min_dist": 1.3199876094287877
+  },
+  {
+    "seed": 4,
+    "metric1_calls_to_solve": null,
+    "metric2_shortest_len": null,
+    "metric2_assoc_calls": null,
+    "best_min_dist": 0.7044669526046755
+  }
+]

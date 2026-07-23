@@ -1,0 +1,34 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-22 23:04:44,416] A new study created in RDB with name: new_ac5
+[I 2026-07-22 23:30:38,552] Trial 0 finished with value: 5546000.864532737 and parameters: {'actor_lr': 0.00011259042510474782, 'critic_lr': 0.0004983141948488712, 'gamma': 0.9215561449486787, 'beta': 0.007027583269124761, 'hidden': 128}. Best is trial 0 with value: 5546000.864532737.
+[I 2026-07-22 23:53:23,047] Trial 1 finished with value: 5703270.479076419 and parameters: {'actor_lr': 1.2536295957826939e-05, 'critic_lr': 0.00011003567941874206, 'gamma': 0.9345599832998113, 'beta': 0.011190039446694328, 'hidden': 256}. Best is trial 0 with value: 5546000.864532737.
+[I 2026-07-23 00:29:24,605] Trial 2 finished with value: 302362.5 and parameters: {'actor_lr': 0.0006329956537229252, 'critic_lr': 0.0002064641645737378, 'gamma': 0.931868501826116, 'beta': 0.005610757608454744, 'hidden': 512}. Best is trial 2 with value: 302362.5.
+[I 2026-07-23 00:51:16,830] Trial 3 finished with value: 5806203.98022916 and parameters: {'actor_lr': 0.0001950787377008719, 'critic_lr': 0.0015734251553683836, 'gamma': 0.9262281544934704, 'beta': 0.0070327078689816505, 'hidden': 256}. Best is trial 2 with value: 302362.5.
+[I 2026-07-23 01:33:10,327] Trial 4 finished with value: 5607636.431240136 and parameters: {'actor_lr': 1.681221060233971e-05, 'critic_lr': 0.0008866788910541594, 'gamma': 0.9715930285867069, 'beta': 0.0023236034449176045, 'hidden': 512}. Best is trial 2 with value: 302362.5.
+[I 2026-07-23 01:35:55,400] Trial 5 pruned. 
+[I 2026-07-23 01:36:31,452] Trial 6 pruned. 
+[I 2026-07-23 01:37:03,984] Trial 7 pruned. 
+[I 2026-07-23 02:24:58,419] Trial 8 pruned. 
+[I 2026-07-23 02:47:01,882] Trial 9 pruned. 
+[I 2026-07-23 02:54:49,568] Trial 10 pruned. 
+[I 2026-07-23 03:13:32,146] Trial 11 pruned. 
+[I 2026-07-23 03:45:04,270] Trial 12 pruned. 
+[I 2026-07-23 03:49:24,398] Trial 13 pruned. 
+[I 2026-07-23 03:59:40,866] Trial 14 pruned. 
+[I 2026-07-23 04:14:18,648] Trial 15 pruned. 
+[I 2026-07-23 04:53:37,290] Trial 16 pruned. 
+[I 2026-07-23 05:00:11,602] Trial 17 pruned. 
+[I 2026-07-23 05:19:25,293] Trial 18 pruned. 
+[I 2026-07-23 05:49:33,337] Trial 19 pruned. 
+[I 2026-07-23 05:54:03,884] Trial 20 pruned. 
+[I 2026-07-23 06:36:38,740] Trial 21 pruned. 
+[I 2026-07-23 07:04:39,859] Trial 22 pruned. 
+[I 2026-07-23 07:14:16,037] Trial 23 finished with value: 30309.5 and parameters: {'actor_lr': 3.3284613931629847e-05, 'critic_lr': 0.00025024752972350306, 'gamma': 0.991552944135841, 'beta': 0.0036250572765758452, 'hidden': 512}. Best is trial 23 with value: 30309.5.
+[I 2026-07-23 07:44:33,760] Trial 24 pruned. 
+[I 2026-07-23 08:15:08,631] Trial 25 finished with value: 5164604.191287331 and parameters: {'actor_lr': 0.00011649971593780029, 'critic_lr': 0.00040712419919797195, 'gamma': 0.9635381860670056, 'beta': 0.009644348930895741, 'hidden': 128}. Best is trial 23 with value: 30309.5.
+[I 2026-07-23 08:15:51,192] Trial 26 pruned. 
+[I 2026-07-23 08:16:30,362] Trial 27 pruned. 
+[I 2026-07-23 08:18:24,865] Trial 28 pruned. 
+[I 2026-07-23 08:30:07,495] Trial 29 pruned. 
+[I 2026-07-23 08:38:49,625] Trial 30 pruned. 
+[I 2026-07-23 08:40:43,288] Trial 31 pruned. 
