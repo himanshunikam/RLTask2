@@ -1,0 +1,8 @@
+nohup: Eingabe wird ignoriert
+[Actor-Critic] config: {'actor_lr': 0.00011108432939000076, 'critic_lr': 0.000260588685860199, 'gamma': 0.9589907801235718, 'beta': 0.0242247803400245, 'hidden': 128}
+
+[Actor-Critic] seed 0: metric1=None | metric2_len=None | metric2_calls=None | minDist=1.72
+[Actor-Critic] seed 1: metric1=6030 | metric2_len=25 | metric2_calls=29290 | minDist=0.22
+[Actor-Critic] seed 2: metric1=2050 | metric2_len=25 | metric2_calls=38040 | minDist=0.02
+[Actor-Critic] seed 3: metric1=None | metric2_len=None | metric2_calls=None | minDist=1.32
+[Actor-Critic] seed 4: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.70

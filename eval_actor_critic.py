@@ -11,7 +11,7 @@ from stoch_actor_critic import train
 
 METHOD       = "Actor-Critic"
 CFG_PATH     = "new_best_actor_critic.json"
-OUT_PATH     = "new_eval_actor_critic_results.json"
+OUT_PATH     = "new_eval_actor_critic_results_s2.json"
 EVAL_SEEDS   = range(10)
 MAX_EPISODES = 5000
 
