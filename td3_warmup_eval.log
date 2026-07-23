@@ -1,0 +1,22 @@
+nohup: Eingabe wird ignoriert
+[TD3] config: {'actor_lr': 0.000114436800203956, 'critic_lr': 0.0021631878545590386, 'tau': 0.010683301695850684, 'gamma': 0.9548739630636724, 'ou_sigma': 0.16795960882114153, 'policy_noise': 0.21865057063325255, 'noise_clip': 0.5773065801575386, 'policy_delay': 3, 'batch': 128, 'hidden': 128}
+
+[TD3] seed 0: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.91
+[TD3] seed 1: metric1=8582 | metric2_len=24 | metric2_calls=56600 | minDist=0.06
+[TD3] seed 2: metric1=4474 | metric2_len=25 | metric2_calls=32966 | minDist=0.04
+[TD3] seed 3: metric1=115471 | metric2_len=56 | metric2_calls=115549 | minDist=0.27
+[TD3] seed 4: metric1=None | metric2_len=None | metric2_calls=None | minDist=0.54
+[TD3] seed 5: metric1=15201 | metric2_len=25 | metric2_calls=87931 | minDist=0.02
+[TD3] seed 6: metric1=14464 | metric2_len=25 | metric2_calls=284655 | minDist=0.15
+[TD3] seed 7: metric1=2476 | metric2_len=22 | metric2_calls=126321 | minDist=0.04
+[TD3] seed 8: metric1=3600 | metric2_len=21 | metric2_calls=8850 | minDist=0.02
+[TD3] seed 9: metric1=5875 | metric2_len=23 | metric2_calls=7905 | minDist=0.06
+
+=== TD3 SUMMARY (averages over solved seeds) ===
+  method: TD3
+  solved: 8/10
+  avg_metric1_calls_to_solve: 21267.875
+  avg_metric2_shortest_len: 27.625
+  avg_metric2_assoc_calls: 90097.125
+
+saved -> eval_td3_results_new_warmup.json

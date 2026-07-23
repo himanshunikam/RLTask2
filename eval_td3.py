@@ -10,8 +10,8 @@ import numpy as np
 from TD3 import train
 
 METHOD       = "TD3"
-CFG_PATH     = "best_td3.json"
-OUT_PATH     = "eval_td3_results.json"
+CFG_PATH     = "best_td3_new.json"
+OUT_PATH     = "eval_td3_results_new_warmup.json"
 EVAL_SEEDS   = range(10)
 MAX_EPISODES = 5000
 
