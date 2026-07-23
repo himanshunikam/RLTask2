@@ -1,0 +1,39 @@
+nohup: Eingabe wird ignoriert
+[I 2026-07-22 22:58:39,890] A new study created in RDB with name: ddpg_tune_session3
+[I 2026-07-22 23:49:00,954] Trial 0 finished with value: 5525803.147249606 and parameters: {'actor_lr': 0.000140547916400382, 'critic_lr': 0.0002566120803663056, 'tau': 0.012005542308109862, 'gamma': 0.9706679678076925, 'ou_sigma': 0.13201371928200337, 'batch': 128, 'hidden': 128}. Best is trial 0 with value: 5525803.147249606.
+[I 2026-07-23 00:07:04,253] Trial 1 finished with value: 5657945.5376860425 and parameters: {'actor_lr': 1.6846347912519006e-05, 'critic_lr': 0.0006681620177652405, 'tau': 0.017653408127188654, 'gamma': 0.9548361082061301, 'ou_sigma': 0.13688233378576894, 'batch': 128, 'hidden': 256}. Best is trial 0 with value: 5525803.147249606.
+[I 2026-07-23 00:28:58,004] Trial 2 finished with value: 126802.0 and parameters: {'actor_lr': 0.00019499144279570051, 'critic_lr': 0.0015886587261335831, 'tau': 0.0025163804120910314, 'gamma': 0.9621065626037241, 'ou_sigma': 0.21195536130605258, 'batch': 128, 'hidden': 128}. Best is trial 2 with value: 126802.0.
+[I 2026-07-23 00:58:53,505] Trial 3 finished with value: 200529.0 and parameters: {'actor_lr': 0.0004028286190471888, 'critic_lr': 0.0003766011786159931, 'tau': 0.008932312553695228, 'gamma': 0.9562980284572452, 'ou_sigma': 0.30386853515796386, 'batch': 128, 'hidden': 128}. Best is trial 2 with value: 126802.0.
+[I 2026-07-23 02:15:09,056] Trial 4 finished with value: 5800154.235049669 and parameters: {'actor_lr': 0.0006474426287688799, 'critic_lr': 0.0006718899183783091, 'tau': 0.011360351491182401, 'gamma': 0.9964903508275323, 'ou_sigma': 0.13128987130369268, 'batch': 64, 'hidden': 128}. Best is trial 2 with value: 126802.0.
+[I 2026-07-23 02:21:06,050] Trial 5 pruned. 
+[I 2026-07-23 02:38:06,109] Trial 6 finished with value: 3352.5 and parameters: {'actor_lr': 8.107967637991128e-05, 'critic_lr': 0.0022867899761920643, 'tau': 0.011371632972876784, 'gamma': 0.9568866541205802, 'ou_sigma': 0.34755030737289283, 'batch': 128, 'hidden': 128}. Best is trial 6 with value: 3352.5.
+[I 2026-07-23 02:40:51,254] Trial 7 pruned. 
+[I 2026-07-23 02:42:00,500] Trial 8 pruned. 
+[I 2026-07-23 02:51:13,891] Trial 9 pruned. 
+[I 2026-07-23 02:52:04,473] Trial 10 pruned. 
+[I 2026-07-23 02:53:54,117] Trial 11 pruned. 
+[I 2026-07-23 02:58:41,476] Trial 12 pruned. 
+[I 2026-07-23 03:01:40,342] Trial 13 pruned. 
+[I 2026-07-23 03:15:46,070] Trial 14 pruned. 
+[I 2026-07-23 03:20:09,389] Trial 15 pruned. 
+[I 2026-07-23 03:40:15,551] Trial 16 pruned. 
+[I 2026-07-23 03:43:08,909] Trial 17 pruned. 
+[I 2026-07-23 03:44:37,010] Trial 18 pruned. 
+[I 2026-07-23 03:48:08,453] Trial 19 pruned. 
+[I 2026-07-23 03:51:53,548] Trial 20 pruned. 
+[I 2026-07-23 03:56:21,911] Trial 21 pruned. 
+[I 2026-07-23 04:01:55,604] Trial 22 pruned. 
+[I 2026-07-23 04:05:12,920] Trial 23 pruned. 
+[I 2026-07-23 04:09:10,134] Trial 24 pruned. 
+[I 2026-07-23 04:13:10,899] Trial 25 pruned. 
+[I 2026-07-23 04:15:57,251] Trial 26 pruned. 
+[I 2026-07-23 04:16:57,315] Trial 27 pruned. 
+[I 2026-07-23 04:18:35,614] Trial 28 pruned. 
+[I 2026-07-23 04:22:48,350] Trial 29 pruned. 
+new code running
+
+=== best trial ===
+score : 3352.5
+params: {'actor_lr': 8.107967637991128e-05, 'critic_lr': 0.0022867899761920643, 'tau': 0.011371632972876784, 'gamma': 0.9568866541205802, 'ou_sigma': 0.34755030737289283, 'batch': 128, 'hidden': 128}
+metric2 (best trial): {'metric2_len_min': 22, 'metric2_len_seed115': 22, 'metric2_len_seed119': 22}
+saved -> best_ddpg.json

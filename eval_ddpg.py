@@ -10,8 +10,8 @@ import numpy as np
 from DDPG import train
 
 METHOD       = "DDPG"
-CFG_PATH     = "best_ddpg.json"
-OUT_PATH     = "eval_ddpg_results.json"
+CFG_PATH     = "best_ddpg_new.json"
+OUT_PATH     = "eval_ddpg_results_new_warmup.json"
 EVAL_SEEDS   = range(10)
 MAX_EPISODES = 5000
 
