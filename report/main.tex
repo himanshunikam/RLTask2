@@ -148,15 +148,16 @@ geringsten Abstand zum Ziel bewertet, damit die Suche auch dann eine Richtung ha
 \toprule
 Hyperparameter & Stoch.\ Actor-Critic & DDPG & TD3 \\
 \midrule
-Actor-Lernrate       & offen & $1{,}7\!\cdot\!10^{-5}$ & $1{,}4\!\cdot\!10^{-4}$ \\
-Critic-Lernrate      & offen & $4{,}8\!\cdot\!10^{-4}$ & $1{,}9\!\cdot\!10^{-3}$ \\
-$\gamma$             & offen & $0{,}992$ & $0{,}962$ \\
-$\tau$ (Polyak)      & --    & $1{,}8\!\cdot\!10^{-3}$ & $8{,}0\!\cdot\!10^{-3}$ \\
-Rauschstärke         & offen & $\sigma_{\text{OU}}=0{,}37$ & $\sigma_{\text{OU}}=0{,}32$ \\
-Target Policy Smoothing & -- & -- & $0{,}34$ / $0{,}50$ \\
-Policy Delay         & --    & -- & $1$ \\
-Batch-Größe          & offen & $128$ & $128$ \\
-Netzgröße            & offen & $256$ & $256$ \\
+Actor-Lernrate       & $1{,}1\!\cdot\!10^{-4}$ & $8{,}1\!\cdot\!10^{-5}$ & $1{,}1\!\cdot\!10^{-4}$ \\
+Critic-Lernrate      & $2{,}6\!\cdot\!10^{-4}$ & $2{,}3\!\cdot\!10^{-3}$ & $2{,}2\!\cdot\!10^{-3}$ \\
+$\gamma$             & $0{,}959$ & $0{,}957$ & $0{,}955$ \\
+$\tau$ (Polyak)      & --       & $1{,}1\!\cdot\!10^{-2}$ & $1{,}1\!\cdot\!10^{-2}$ \\
+Entropie $\beta$     & $0{,}024$ & -- & -- \\
+Rauschstärke         & --       & $\sigma_{\text{OU}}=0{,}35$ & $\sigma_{\text{OU}}=0{,}17$ \\
+Target Policy Smoothing & --    & -- & $0{,}22$ / $0{,}58$ \\
+Policy Delay         & --       & -- & $3$ \\
+Batch-Größe          & -- (online) & $128$ & $128$ \\
+Netzgröße            & $128$    & $128$ & $128$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -165,8 +166,7 @@ Netzgröße            & offen & $256$ & $256$ \\
 \section{Ergebnisse}
 Jedes Verfahren wird mit seiner besten Konfiguration auf den Seeds 0 bis 9 ausgewertet, mit
 einem Budget von 5000 Episoden je Seed. Tabelle~\ref{tab:main} zeigt, wie viele Arenen gelöst
-wurden und die Mittelwerte über die jeweils gelösten Seeds. Die Auswertung des stochastischen
-Actor-Critic steht noch aus und wird nachgetragen.
+wurden und die Mittelwerte über die jeweils gelösten Seeds.
 
 \begin{table}[h]
 \centering
@@ -177,48 +177,52 @@ Actor-Critic steht noch aus und wird nachgetragen.
 \toprule
 Verfahren & Gelöste Seeds & Metrik 1 & Metrik 2 & Zugehörige Aufrufe \\
 \midrule
-Stoch.\ Actor-Critic & offen          & offen  & offen  & offen \\
-DDPG                 & 5/10           & 4.473  & 24{,}2 & 88.761 \\
-TD3                  & \textbf{10/10} & 89.295 & 37{,}9 & 147.919 \\
+Stoch.\ Actor-Critic & 7/10 & 12.157 & 30{,}3 & 45.760 \\
+DDPG                 & 8/10 & 22.654 & 30{,}8 & 47.645 \\
+TD3                  & 8/10 & 21.268 & 27{,}6 & 90.097 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Die Mittelwerte beziehen sich jeweils nur auf die von einem Verfahren gelösten Seeds und sind
-deshalb nicht unmittelbar vergleichbar. TD3 löst als einziges Verfahren auch die beiden
-schwersten Arenen (Seeds 4 und 8), die lange Wege von 83 beziehungsweise 92 Schritten
-erfordern; genau diese beiden Läufe heben die Mittelwerte von TD3 deutlich an. DDPG löst nur
-fünf, eher leichte Arenen, was seinen niedrigen Wert bei Metrik 1 erklärt. Tabelle
-\ref{tab:perseed} zeigt daher die Einzelergebnisse.
+deshalb nicht unmittelbar vergleichbar. Kein Verfahren ist eindeutig am robustesten: DDPG und
+TD3 lösen je acht der zehn Arenen, der stochastische Actor-Critic sieben. Auffällig ist, dass
+die drei Verfahren auf unterschiedlichen Arenen scheitern (Actor-Critic auf 0, 3 und 6; DDPG
+auf 3 und 9; TD3 auf 0 und 4); keine Arena bleibt von allen dreien ungelöst. Die Schwierigkeit
+ist also eher arena- als verfahrensspezifisch. Tabelle~\ref{tab:perseed} zeigt die
+Einzelergebnisse.
 
 \begin{table}[h]
 \centering
 \small
 \caption{Ergebnisse je Seed. Ein Strich bedeutet, dass die Arena im Budget nicht gelöst wurde.}
 \label{tab:perseed}
-\begin{tabular}{ccccc}
+\begin{tabular}{ccccccc}
 \toprule
-Seed & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
-     & Metrik 1 & Metrik 2 & Metrik 1 & Metrik 2 \\
+Seed & \multicolumn{2}{c}{Stoch.\ AC} & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
+     & Metrik 1 & M2 & Metrik 1 & M2 & Metrik 1 & M2 \\
 \midrule
-0 & --    & -- & 121.118 & 26 \\
-1 & --    & -- & 32.362  & 23 \\
-2 & 1.235 & 27 & 10.022  & 25 \\
-3 & --    & -- & 250.901 & 35 \\
-4 & --    & -- & 144.963 & 83 \\
-5 & 3.185 & 26 & 3.192   & 25 \\
-6 & --    & -- & 45.808  & 24 \\
-7 & 7.228 & 23 & 3.151   & 23 \\
-8 & 4.573 & 22 & 279.128 & 92 \\
-9 & 6.146 & 23 & 2.301   & 23 \\
+0 & --     & -- & 43.360 & 36 & --      & -- \\
+1 & 235    & 56 & 63.899 & 36 & 8.582   & 24 \\
+2 & 3.396  & 25 & 9.611  & 25 & 4.474   & 25 \\
+3 & --     & -- & --     & -- & 115.471 & 56 \\
+4 & 67.478 & 40 & 38.868 & 54 & --      & -- \\
+5 & 6.553  & 26 & 3.487  & 25 & 15.201  & 25 \\
+6 & --     & -- & 14.596 & 26 & 14.464  & 25 \\
+7 & 711    & 22 & 4.496  & 23 & 2.476   & 22 \\
+8 & 1.883  & 20 & 2.918  & 21 & 3.600   & 21 \\
+9 & 4.842  & 23 & --     & -- & 5.875   & 23 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Betrachtet man nur die fünf Seeds, die beide Verfahren lösen (2, 5, 7, 8 und 9), so liegt DDPG
-bei Metrik 1 im Mittel bei 4.473 Aufrufen und TD3 bei 59.559. Ohne den teuren Seed 8 sinkt TD3
-allerdings auf 4.667 Aufrufe und liegt damit gleichauf. Bei Metrik 2 sind beide Verfahren auf
-diesen Seeds nahezu identisch.
+Betrachtet man nur die fünf Seeds, die alle drei Verfahren lösen (1, 2, 5, 7 und 8), ergibt
+sich ein klareres Bild. Bei Metrik 2, der Weglänge, liefert TD3 mit im Mittel 23{,}4 Schritten
+die kürzesten Wege, gefolgt von DDPG (26{,}0) und dem stochastischen Actor-Critic (29{,}8); die
+feine Steuerung von TD3 zahlt sich hier aus. Bei Metrik 1, den Aufrufen bis zur ersten Lösung,
+erreicht der stochastische Actor-Critic mit im Mittel 2.556 Aufrufen überraschend den
+niedrigsten Wert, vor TD3 (6.867) und DDPG (16.882); der hohe Wert von DDPG geht dabei fast
+vollständig auf die schwierige Arena mit Seed 1 zurück.
 
 % Platzhalter für Abbildungen, nach dem Erzeugen der Plots einkommentieren:
 % \begin{figure}[h]\centering
@@ -270,28 +274,32 @@ einen niedrigeren Wert, sodass ein Agent es rational vermeidet, sich dem Ziel zu
 das erzeugt die beiden beobachteten lokalen Optima, nämlich die Flucht in den freien Raum und
 das Verharren am Startpunkt.
 
-Unter den ausgewerteten Verfahren ist TD3 mit Abstand das robusteste und löst als einziges alle
-zehn Arenen. Die drei Erweiterungen gegenüber DDPG wirken hier also genau wie beabsichtigt: Das
-Minimum zweier Critics verhindert, dass der Actor überschätzte Aktionswerte ausnutzt, was gerade
-bei der großen Kollisionsstrafe entscheidend ist. DDPG ist auf den Arenen, die es löst, sehr
-stichprobeneffizient, scheitert aber an den schwereren Layouts. Bemerkenswert ist, dass die
-getunte TD3-Konfiguration einen Policy Delay von eins gewählt hat, die verzögerte Aktualisierung
-des Actors auf den Tuning-Seeds also keinen Vorteil brachte.
+Kein Verfahren dominiert in dieser Auswertung. DDPG und TD3 lösen je acht Arenen, der
+stochastische Actor-Critic sieben, und die Ausfälle verteilen sich über verschiedene Arenen.
+Deutlicher ist der Unterschied bei der Weglänge: TD3 erzeugt die kürzesten Wege, was die feine,
+abgestufte Steuerung des Verfahrens widerspiegelt. Das Minimum zweier Critics verhindert dabei,
+dass der Actor überschätzte Aktionswerte ausnutzt, was gerade bei der großen Kollisionsstrafe
+hilfreich ist. Die getunte TD3-Konfiguration verwendet einen Policy Delay von drei, die
+verzögerte Aktualisierung des Actors kommt hier also tatsächlich zum Einsatz.
 
-Erwartungsgemäß dürfte der stochastische Actor-Critic bei Metrik 1 schlechter abschneiden als
-die beiden off-policy Verfahren, da er jeden Übergang nur einmal verwendet und keinen Replay
-Buffer besitzt. Auf einer Aufgabe, bei der das Ziel so selten erreicht wird, wiegt das schwer,
-weil eine seltene erfolgreiche Episode sofort wieder verworfen wird, statt vielfach
-wiederverwendet zu werden.
+Entgegen der Erwartung, dass ein on-policy Verfahren ohne Replay Buffer bei der
+Stichprobeneffizienz klar zurückfällt, erreicht der stochastische Actor-Critic auf den
+gemeinsam gelösten Arenen die wenigsten Aufrufe bis zur ersten Lösung. Auf dieser Aufgabe
+scheinen das starke Reward Shaping und der getunte Entropiebonus den Nachteil der fehlenden
+Wiederverwendung von Übergängen weitgehend auszugleichen. Erkauft wird dies allerdings mit der
+geringsten Robustheit und den längsten Wegen: Das Verfahren löst weniger Arenen und findet dort,
+wo es löst, weniger direkte Wege als die beiden off-policy Verfahren.
 
 % ================================================================== 8
 \section{Fazit}
 Verglichen wurden ein on-policy Verfahren und zwei off-policy Verfahren für kontinuierliche
 Aktionen, zusammen mit den Techniken, die das Lernen in dieser Umgebung überhaupt ermöglichen,
 also Eingangsnormalisierung, asymmetrisches Reward-Clipping und dauerhaft starke Exploration.
-TD3 ist das robusteste Verfahren und löst alle zehn Arenen, während DDPG nur die leichteren
-Layouts bewältigt, dort aber sehr stichprobeneffizient ist. Die Zahlen für den stochastischen
-Actor-Critic werden nach Abschluss seiner Auswertung ergänzt.
+Alle drei Verfahren lösen sieben bis acht der zehn Arenen; kein Verfahren ist eindeutig
+überlegen. TD3 findet die kürzesten Wege, der stochastische Actor-Critic ist auf den von ihm
+gelösten Arenen am schnellsten bei der ersten Lösung, aber am wenigsten robust, und DDPG liegt
+dazwischen. Die verbleibende Schwierigkeit liegt weniger in der Wahl des Verfahrens als in
+einzelnen, besonders dicht verbauten Arenen.
 
 % ================================================================== 9
 \section{Quellen}

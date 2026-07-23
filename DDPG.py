@@ -1,9 +1,9 @@
 from asteroid import AsteroidStatic
-from action_space import CallCounter
+from old.action_space import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
-from actor_critic import Actor, Critic, Buffer
+from old.actor_critic import Actor, Critic, Buffer
 
 
 class OUNoise:

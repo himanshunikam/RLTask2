@@ -1,7 +1,7 @@
 from asteroid import AsteroidStatic
 from collections import deque
 import random
-from action_space import CallCounter
+from old.action_space import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
