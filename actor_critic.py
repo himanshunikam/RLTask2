@@ -1,13 +1,14 @@
+# Quelle : Reinforcement Learning Folie 430
+
 from asteroid import AsteroidStatic
 from collections import deque
 import random
-from old.action_space import CallCounter
+from agent import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
 
 
-# --- input normalization (env defaults: world_bounds=(-0.5,4.5,-0.5,4.5), v_max=4.0) ---
 NORM_CENTER = torch.tensor([2.0, 2.0, 0.0, 0.0])
 NORM_SCALE  = torch.tensor([2.5, 2.5, 4.0, 4.0])
 
@@ -46,10 +47,11 @@ class Critic(nn.Module):
 
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, hidden=256, beta= 0.01,
+def train(seed, actor_lr=0.00011108432939000076, critic_lr=0.000260588685860199, gamma=0.9589907801235718, hidden=128, beta= 0.0242247803400245,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
           report_step_offset=0, trial=None, verbose=False):
-    """One fresh training run. Returns (metric1_calls_to_first_solve, best_min_dist, best_success_len)."""
+    """One training run. 
+    Returns (metric1_calls_to_first_solve, best_min_dist, best_success_len)."""
     env = AsteroidStatic(seed=seed)
     counter = CallCounter(env=env)
     metric1_calls_to_first_solve = None   # calls when goal first reached
@@ -132,4 +134,4 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99, hidden=256, beta= 0.0
 
 
 if __name__ == "__main__":
-    train(seed=2)
+    train(seed=7, verbose=True)

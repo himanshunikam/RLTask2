@@ -1,20 +1,10 @@
-"""Optuna hyperparameter search for TD3.
-
-Run:  python tune_td3.py
-
-Tunes on TUNE_SEEDS (disjoint from the 0-9 eval seeds -- Task2 rule). Objective =
-calls-to-first-solve (lower is better) with a distance fallback when a config never
-solves within the budget. Best params printed and saved to best_td3.json.
-
-Reuses the real train() from TD3.py (no duplicated algorithm here).
-"""
 import json
 import numpy as np
 import optuna
 from TD3 import train
 
-# ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [115, 119]     # easiest of 100-119 (random occasionally reaches goal)
+
+TUNE_SEEDS   = [115, 119]    
 MAX_EPISODES = 5000
 N_TRIALS     = 30
 
@@ -43,7 +33,7 @@ def objective(trial):
         m1, bmd, m2_len, _ = train(seed=seed, max_episodes=MAX_EPISODES,
                                    report_step_offset=i * MAX_EPISODES, trial=trial, **params)
         scores.append(score(m1, bmd))
-        trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)   # shortest successful episode (or None)
+        trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)   
     solved = [v for k, v in trial.user_attrs.items()
               if k.startswith("metric2_len_seed") and v is not None]
     trial.set_user_attr("metric2_len_min", int(min(solved)) if solved else None)

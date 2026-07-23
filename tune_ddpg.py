@@ -1,20 +1,9 @@
-"""Optuna hyperparameter search for DDPG.
-
-Run:  python tune_ddpg.py
-
-Tunes on TUNE_SEEDS (disjoint from the 0-9 eval seeds -- Task2 rule). Objective =
-calls-to-first-solve (lower is better) with a distance fallback when a config never
-solves within the budget. Best params printed and saved to best_ddpg.json.
-
-Reuses the real train() from DDPG.py (no duplicated algorithm here).
-"""
 import json
 import numpy as np
 import optuna
 from DDPG import train
 
-# ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [115, 119]     # easiest of 100-119 (random occasionally reaches goal)
+TUNE_SEEDS   = [115, 119]     
 MAX_EPISODES = 5000
 N_TRIALS     = 30
 
@@ -40,7 +29,7 @@ def objective(trial):
         m1, bmd, m2_len, _ = train(seed=seed, max_episodes=MAX_EPISODES,
                                    report_step_offset=i * MAX_EPISODES, trial=trial, **params)
         scores.append(score(m1, bmd))
-        trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)   # shortest successful episode (or None)
+        trial.set_user_attr(f"metric2_len_seed{seed}", m2_len)  
     solved = [v for k, v in trial.user_attrs.items()
               if k.startswith("metric2_len_seed") and v is not None]
     trial.set_user_attr("metric2_len_min", int(min(solved)) if solved else None)
@@ -51,7 +40,7 @@ if __name__ == "__main__":
     print("new code running")
     study = optuna.create_study(
         study_name="ddpg_tune_session3",
-        storage="sqlite:///tune_ddpg_s3.db",     # <-- persists every completed trial to disk
+        storage="sqlite:///tune_ddpg_s3.db",     
         direction="minimize",
         load_if_exists=True,  
         pruner=optuna.pruners.MedianPruner(n_warmup_steps=1000),

@@ -1,9 +1,11 @@
+# Quelle : Reinforcement Learning Folie 440
+
 from asteroid import AsteroidStatic
-from old.action_space import CallCounter
+from agent import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
-from old.actor_critic import Actor, Critic, Buffer
+from agent import Actor, Critic, Buffer
 from DDPG import OUNoise, ddpg_act        # OU exploration is identical to DDPG
 
 
@@ -39,9 +41,9 @@ def td3_learn(batch, steps, actor, critic1, critic2,
                 tp.data.mul_(1 - tau).add_(tau * p.data)
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
-          tau=0.005, ou_sigma=0.2, policy_noise=0.2, noise_clip=0.5,
-          policy_delay=2, batch=128, hidden=256, warmup=2000,
+def train(seed, actor_lr=0.0001144368002039, critic_lr=0.0021631878545590386, gamma= 0.9548739630636724,
+          tau=0.010683301695850684, ou_sigma=0.16795960882114153, policy_noise= 0.21865057063325255, noise_clip=0.5773065801575386,
+          policy_delay=3, batch=128, hidden=128, warmup=2000,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
           report_step_offset=0, trial=None, verbose=False):
     """One fresh TD3 training run. Returns (metric1, best_min_dist, best_success_len)."""
@@ -126,4 +128,4 @@ def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
 
 
 if __name__ == "__main__":
-    train(seed=119, verbose=True)
+    train(seed=7, verbose=True)

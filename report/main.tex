@@ -16,6 +16,8 @@
 \usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{parskip}
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+\addbibresource{references.bib}
 
 \definecolor{secblue}{RGB}{31,73,125}
 \titleformat{\section}{\normalfont\large\bfseries\color{secblue}}{\thesection.}{0.6em}{}
@@ -41,12 +43,12 @@ Matrikelnummer: 25901848
 Das Projekt besteht aus mehreren eigenen Dateien. Die vorgegebene Datei \texttt{asteroid.py}
 wurde nicht verändert:
 \begin{itemize}\setlength\itemsep{1pt}
-  \item \texttt{stoch\_actor\_critic.py} \textendash{} stochastischer Actor-Critic (One-step, on-policy).
+  \item \texttt{actor\_critic.py} \textendash{} Actor-Critic (One-step, on-policy).
   \item \texttt{DDPG.py} \textendash{} Deep Deterministic Policy Gradient.
   \item \texttt{TD3.py} \textendash{} Twin Delayed DDPG.
-  \item \texttt{tune\_stochastic\_ac.py}, \texttt{tune\_ddpg.py}, \texttt{tune\_td3.py} \textendash{}
+  \item \texttt{tune\_ac.py}, \texttt{tune\_ddpg.py}, \texttt{tune\_td3.py} \textendash{}
         Optuna-Tuning für die jeweilige Methode.
-  \item \texttt{eval\_*.py} sowie die zugehörigen Tuning-Logs, Optuna-Datenbanken
+  \item die zugehörigen Tuning-Logs, Optuna-Datenbanken
         (\texttt{*.db}), die besten Konfigurationen (\texttt{best\_*.json}) und die
         Auswertungsergebnisse (\texttt{eval\_*\_results.json}).
 \end{itemize}
@@ -64,36 +66,26 @@ Die Umgebung besitzt einen kontinuierlichen Aktionsraum, weshalb alle drei umges
 Verfahren direkt auf dem Vektor $a=[a_x,a_y]$ arbeiten. Untersucht wurden ein on-policy
 Verfahren und zwei off-policy Verfahren.
 
-\subsection{On-policy: Stochastischer Actor-Critic (in stoch\_actor\_critic.py)}
-Dieses Verfahren folgt der Vorlesungsformulierung des One-step Actor-Critic. Der Actor ist
-eine stochastische Gauß-Politik $\pi(a|s,\theta)$, die Mittelwert und Streuung ausgibt; die
-Aktion wird aus dieser Verteilung gezogen. Der Critic schätzt den Zustandswert $V(s,w)$.
-Beide werden mit demselben TD-Fehler
-$\delta = R + \gamma \hat V(S',w) - \hat V(S,w)$ aktualisiert, der Critic über $\delta^2$ und
-der Actor über $-\log \pi(a|s)\,\delta$. Zusätzlich wird ein Entropiebonus addiert, der die
-Streuung der Politik offen hält, sowie der Faktor $I \leftarrow \gamma I$ aus der
-Vorlesungsfolie verwendet. Die Exploration entsteht hier ausschließlich durch das Ziehen aus
-der Verteilung.
+\subsection{On-policy: Actor-Critic (in actor\_critic.py)}
+Der Actor ist eine Gauß-Politik $\pi(a|s)$, aus der die Aktion gezogen wird; der Critic schätzt
+den Zustandswert $V(s)$. Beide werden mit dem TD-Fehler $\delta = R + \gamma V(S') - V(S)$
+aktualisiert, ergänzt um einen Entropiebonus für die Exploration. Das Verfahren ist on-policy
+und nutzt keinen Replay Buffer.
 
 \subsection{Off-policy: DDPG (in DDPG.py)}
-DDPG ersetzt die stochastische Politik durch einen deterministischen Actor $\mu(s)$ und den
-Zustandswert durch einen Aktionswert $Q(s,a)$. Dadurch wird das Verfahren off-policy und kann
-einen Replay Buffer nutzen, was für die Stichprobeneffizienz wichtig ist. Der Actor wird über
-den deterministischen Policy-Gradienten trainiert, also in Richtung steigender $Q$-Werte.
-Stabilisiert wird das Ganze durch Zielnetze mit weichen Polyak-Updates und durch zeitlich
-korreliertes Ornstein-Uhlenbeck-Rauschen, das die Exploration liefert.
+DDPG verwendet einen deterministischen Actor $\mu(s)$ und einen Aktionswert-Critic $Q(s,a)$.
+Dadurch ist es off-policy und nutzt einen Replay Buffer sowie Zielnetze mit weichen
+Polyak-Updates. Die Exploration liefert Ornstein-Uhlenbeck-Rauschen auf der Aktion.
 
 \subsection{Off-policy: TD3 (in TD3.py)}
-TD3 erweitert DDPG um drei Punkte. Erstens werden zwei Critics gelernt und im Ziel das
-Minimum beider verwendet, was die typische Überschätzung der Aktionswerte dämpft. Zweitens
-wird auf die Zielaktion ein begrenztes Rauschen addiert (Target Policy Smoothing), damit der
-Critic keine scharfen Ausreißer im $Q$-Verlauf ausnutzen kann. Drittens wird der Actor
-seltener aktualisiert als die Critics, damit die Wertschätzung dem Actor vorauseilt.
+TD3 erweitert DDPG um drei Punkte: zwei Critics, von denen im Ziel das Minimum genutzt wird
+(gegen Überschätzung), ein begrenztes Rauschen auf der Zielaktion (Target Policy Smoothing)
+und seltener aktualisierte Actor- und Zielnetze.
 
 \subsection{Weitere erprobte Ansätze}
 Vor den drei eingereichten Verfahren wurde auch die DQN-Familie umgesetzt und getestet
 (DQN, Double DQN und Dueling DDQN). Da DQN einen endlichen Aktionsraum benötigt, wurde die
-Aktion dafür in neun Bang-Bang-Aktionen diskretisiert, also alle Kombinationen aus
+Aktion dafür in neun Aktionen diskretisiert, also alle Kombinationen aus
 $\{-1,0,+1\}$ für $a_x$ und $a_y$. Dieser Ansatz löste einzelne Arenen zuverlässig, ist aber
 nicht Teil der Abgabe, da der Schwerpunkt auf den Verfahren für kontinuierliche Aktionen
 liegt.
@@ -113,7 +105,7 @@ liegt.
         So bleiben die seltenen erfolgreichen Übergänge das dominierende Signal.
   \item \textbf{Exploration.} Ein rein zufälliger Agent erreicht das Ziel nur in etwa
         $0{,}2\,\%$ der Episoden und auf mehreren Arenen überhaupt nicht. Die Exploration muss
-        daher dauerhaft stark bleiben. Beim stochastischen Actor-Critic übernimmt das der
+        daher dauerhaft stark bleiben. Beim Actor-Critic übernimmt das der
         Entropiebonus, bei DDPG und TD3 das korrelierte Ornstein-Uhlenbeck-Rauschen.
   \item \textbf{Begrenzung der Streuung.} Die Streuung der Gauß-Politik wird über
         \texttt{log\_std} gelernt und auf einen festen Bereich begrenzt. Ohne diese Begrenzung
@@ -129,7 +121,7 @@ Die Hyperparameter werden mit Optuna gesucht, für jede Methode in einem eigenen
 einer eigenen SQLite-Datenbank, sodass unterbrochene Läufe fortgesetzt werden können. Getunt
 werden unter anderem die Lernraten von Actor und Critic, $\gamma$, die Netzgröße sowie die
 methodenspezifischen Parameter, also $\tau$ und die Rauschstärke bei DDPG und TD3
-beziehungsweise der Entropiekoeffizient beim stochastischen Actor-Critic.
+beziehungsweise der Entropiekoeffizient beim Actor-Critic.
 
 Die Tuning-Seeds sind von den Auswertungs-Seeds getrennt. Um geeignete Tuning-Seeds zu finden,
 wurden die Kandidaten 100 bis 119 zunächst mit einem Zufallsagenten vermessen. Auf den meisten
@@ -146,7 +138,7 @@ geringsten Abstand zum Ziel bewertet, damit die Suche auch dann eine Richtung ha
 \label{tab:hyper}
 \begin{tabular}{lccc}
 \toprule
-Hyperparameter & Stoch.\ Actor-Critic & DDPG & TD3 \\
+Hyperparameter & Actor-Critic & DDPG & TD3 \\
 \midrule
 Actor-Lernrate       & $1{,}1\!\cdot\!10^{-4}$ & $8{,}1\!\cdot\!10^{-5}$ & $1{,}1\!\cdot\!10^{-4}$ \\
 Critic-Lernrate      & $2{,}6\!\cdot\!10^{-4}$ & $2{,}3\!\cdot\!10^{-3}$ & $2{,}2\!\cdot\!10^{-3}$ \\
@@ -177,7 +169,7 @@ wurden und die Mittelwerte über die jeweils gelösten Seeds.
 \toprule
 Verfahren & Gelöste Seeds & Metrik 1 & Metrik 2 & Zugehörige Aufrufe \\
 \midrule
-Stoch.\ Actor-Critic & 7/10 & 12.157 & 30{,}3 & 45.760 \\
+Actor-Critic & 7/10 & 12.157 & 30{,}3 & 45.760 \\
 DDPG                 & 8/10 & 22.654 & 30{,}8 & 47.645 \\
 TD3                  & 8/10 & 21.268 & 27{,}6 & 90.097 \\
 \bottomrule
@@ -186,7 +178,7 @@ TD3                  & 8/10 & 21.268 & 27{,}6 & 90.097 \\
 
 Die Mittelwerte beziehen sich jeweils nur auf die von einem Verfahren gelösten Seeds und sind
 deshalb nicht unmittelbar vergleichbar. Kein Verfahren ist eindeutig am robustesten: DDPG und
-TD3 lösen je acht der zehn Arenen, der stochastische Actor-Critic sieben. Auffällig ist, dass
+TD3 lösen je acht der zehn Arenen, der Actor-Critic sieben. Auffällig ist, dass
 die drei Verfahren auf unterschiedlichen Arenen scheitern (Actor-Critic auf 0, 3 und 6; DDPG
 auf 3 und 9; TD3 auf 0 und 4); keine Arena bleibt von allen dreien ungelöst. Die Schwierigkeit
 ist also eher arena- als verfahrensspezifisch. Tabelle~\ref{tab:perseed} zeigt die
@@ -199,7 +191,7 @@ Einzelergebnisse.
 \label{tab:perseed}
 \begin{tabular}{ccccccc}
 \toprule
-Seed & \multicolumn{2}{c}{Stoch.\ AC} & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
+Seed & \multicolumn{2}{c}{Actor-Critic} & \multicolumn{2}{c}{DDPG} & \multicolumn{2}{c}{TD3} \\
      & Metrik 1 & M2 & Metrik 1 & M2 & Metrik 1 & M2 \\
 \midrule
 0 & --     & -- & 43.360 & 36 & --      & -- \\
@@ -218,30 +210,23 @@ Seed & \multicolumn{2}{c}{Stoch.\ AC} & \multicolumn{2}{c}{DDPG} & \multicolumn{
 
 Betrachtet man nur die fünf Seeds, die alle drei Verfahren lösen (1, 2, 5, 7 und 8), ergibt
 sich ein klareres Bild. Bei Metrik 2, der Weglänge, liefert TD3 mit im Mittel 23{,}4 Schritten
-die kürzesten Wege, gefolgt von DDPG (26{,}0) und dem stochastischen Actor-Critic (29{,}8); die
+die kürzesten Wege, gefolgt von DDPG (26{,}0) und dem Actor-Critic (29{,}8); die
 feine Steuerung von TD3 zahlt sich hier aus. Bei Metrik 1, den Aufrufen bis zur ersten Lösung,
-erreicht der stochastische Actor-Critic mit im Mittel 2.556 Aufrufen überraschend den
+erreicht der Actor-Critic mit im Mittel 2.556 Aufrufen überraschend den
 niedrigsten Wert, vor TD3 (6.867) und DDPG (16.882); der hohe Wert von DDPG geht dabei fast
 vollständig auf die schwierige Arena mit Seed 1 zurück.
 
-% Platzhalter für Abbildungen, nach dem Erzeugen der Plots einkommentieren:
-% \begin{figure}[h]\centering
-%   \includegraphics[width=0.8\linewidth]{lernkurve.png}
-%   \caption{Lernkurve: Episodenlänge und Erfolgsrate über der Anzahl der Aufrufe.}
-% \end{figure}
+Abbildung~\ref{fig:td3traj} zeigt beispielhaft die Route eines trainierten TD3-Agenten
+auf Seed 7.
+
+\begin{figure}[h]\centering
+  \includegraphics[width=0.55\linewidth]{td3_trajectory_seed7_new.png}
+  \caption{Route eines trainierten TD3-Agenten auf Seed 7 (Ziel erreicht nach 28 Schritten).}
+  \label{fig:td3traj}
+\end{figure}
 
 % ================================================================== 6
 \section{Fehlgeschlagene Versuche}
-
-\subsection{Deterministischer Actor-Critic}
-Zuerst wurde ein deterministischer Actor-Critic umgesetzt, also im Kern DDPG ohne dessen
-Stabilisierungen. Dieser kollabierte zuverlässig auf die Nullaktion: Der Actor gab eine
-Beschleunigung nahe null aus, das Raumschiff blieb am Startpunkt stehen und überlebte bis zum
-Zeitlimit mit einer Belohnung von etwa null. Das ist aus Sicht des Agenten rational, weil
-Nichtstun keine Kollisionsstrafe kostet, während jeder Versuch, das Ziel zu erreichen, im
-Hindernisfeld endet. Erst eine deutlich verstärkte Exploration brachte ihn aus diesem lokalen
-Optimum heraus. Für die Abgabe wurde er durch den stochastischen Actor-Critic ersetzt, der
-näher an der Vorlesungsformulierung liegt.
 
 \subsection{Symmetrisches Reward-Clipping}
 Ein erster Versuch begrenzte die Belohnung symmetrisch auf $[-1,1]$. Damit wurde zwar die
@@ -251,7 +236,7 @@ gegenüber einer Kollision, und die Wertschätzungen kollabierten weiterhin. Ers
 asymmetrische Variante aus Abschnitt 3 löste das Problem.
 
 \subsection{Zu weite Suchbereiche beim Tuning}
-Ein Tuning-Lauf des stochastischen Actor-Critic brach nach zwei Trials vollständig ab. Die
+Ein Tuning-Lauf des Actor-Critic brach nach zwei Trials vollständig ab. Die
 Suchbereiche für die Lernraten waren zu weit gewählt, sodass Optuna Werte bis 0,245 für den
 Critic vorschlug. Bei solchen Lernraten divergiert der TD-Fehler, und der Entropiebonus treibt
 die gelernte Streuung der Politik unbegrenzt nach oben, bis sie numerisch überläuft und die
@@ -275,7 +260,7 @@ das erzeugt die beiden beobachteten lokalen Optima, nämlich die Flucht in den f
 das Verharren am Startpunkt.
 
 Kein Verfahren dominiert in dieser Auswertung. DDPG und TD3 lösen je acht Arenen, der
-stochastische Actor-Critic sieben, und die Ausfälle verteilen sich über verschiedene Arenen.
+Actor-Critic sieben, und die Ausfälle verteilen sich über verschiedene Arenen.
 Deutlicher ist der Unterschied bei der Weglänge: TD3 erzeugt die kürzesten Wege, was die feine,
 abgestufte Steuerung des Verfahrens widerspiegelt. Das Minimum zweier Critics verhindert dabei,
 dass der Actor überschätzte Aktionswerte ausnutzt, was gerade bei der großen Kollisionsstrafe
@@ -283,7 +268,7 @@ hilfreich ist. Die getunte TD3-Konfiguration verwendet einen Policy Delay von dr
 verzögerte Aktualisierung des Actors kommt hier also tatsächlich zum Einsatz.
 
 Entgegen der Erwartung, dass ein on-policy Verfahren ohne Replay Buffer bei der
-Stichprobeneffizienz klar zurückfällt, erreicht der stochastische Actor-Critic auf den
+Stichprobeneffizienz klar zurückfällt, erreicht der Actor-Critic auf den
 gemeinsam gelösten Arenen die wenigsten Aufrufe bis zur ersten Lösung. Auf dieser Aufgabe
 scheinen das starke Reward Shaping und der getunte Entropiebonus den Nachteil der fehlenden
 Wiederverwendung von Übergängen weitgehend auszugleichen. Erkauft wird dies allerdings mit der
@@ -296,12 +281,13 @@ Verglichen wurden ein on-policy Verfahren und zwei off-policy Verfahren für kon
 Aktionen, zusammen mit den Techniken, die das Lernen in dieser Umgebung überhaupt ermöglichen,
 also Eingangsnormalisierung, asymmetrisches Reward-Clipping und dauerhaft starke Exploration.
 Alle drei Verfahren lösen sieben bis acht der zehn Arenen; kein Verfahren ist eindeutig
-überlegen. TD3 findet die kürzesten Wege, der stochastische Actor-Critic ist auf den von ihm
+überlegen. TD3 findet die kürzesten Wege, der Actor-Critic ist auf den von ihm
 gelösten Arenen am schnellsten bei der ersten Lösung, aber am wenigsten robust, und DDPG liegt
 dazwischen. Die verbleibende Schwierigkeit liegt weniger in der Wahl des Verfahrens als in
 einzelnen, besonders dicht verbauten Arenen.
 
 % ================================================================== 9
 \section{Quellen}
-
+\nocite{*}
+\printbibliography
 \end{document}

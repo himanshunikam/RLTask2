@@ -1,12 +1,17 @@
+# Quelle : Reinforcement Learning Folie 439
+# DDPG : https://towardsdatascience.com/understanding-ddpg-the-algorithm-that-solves-continuous-action-control-challenges-742c67e0783a/
+
+
 from asteroid import AsteroidStatic
-from old.action_space import CallCounter
+from agent import CallCounter
 import numpy as np
 import torch
 import torch.nn as nn
-from old.actor_critic import Actor, Critic, Buffer
+from agent import Actor, Critic, Buffer
 
 
 class OUNoise:
+    # Ornstein Uhlenbeck Noise
     def __init__(self, dim=2, theta=0.15, sigma=0.2, dt=1.0):
         self.theta, self.sigma, self.dt, self.dim = theta, sigma, dt, dim
         self.reset()
@@ -52,11 +57,11 @@ def ddpg_learn(batch, actor, critic, actor_target, critic_target,
             tp.data.mul_(1 - tau).add_(tau * p.data)
 
 
-def train(seed, actor_lr=1e-4, critic_lr=1e-3, gamma=0.99,
-          tau=0.005, ou_sigma=0.2, batch=128, hidden=256, warmup=2000,
+def train(seed, actor_lr=8.107967637991128e-05, critic_lr=0.0022867899761920643, gamma= 0.9568866541205802,
+          tau= 0.01137163297287678, ou_sigma=0.34755030737289283, batch=128, hidden=128, warmup=2000,
           crash_floor=-0.5, max_episodes=5000, report_every=25,
           report_step_offset=0, trial=None, verbose=False):
-    """One fresh DDPG training run. Returns (metric1, best_min_dist, best_success_len)."""
+    """One DDPG training run. Returns (metric1, best_min_dist, best_success_len)."""
     env = AsteroidStatic(seed=seed)
     counter = CallCounter(env=env)
 

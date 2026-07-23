@@ -12,7 +12,7 @@ Reuses the real train() from actor_critic.py (no duplicated algorithm here).
 import json
 import numpy as np
 import optuna
-from actor_critic import train
+from old.old_actor_critic import train
 
 # ---- search / budget knobs (raise for a better search, lower for speed) ----------
 TUNE_SEEDS   = [115, 119]     # 107 111

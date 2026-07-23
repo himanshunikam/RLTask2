@@ -1,10 +1,10 @@
 import json
 import numpy as np
 import optuna
-from stoch_actor_critic import train
+from actor_critic import train
 
-# ---- search / budget knobs (raise for a better search, lower for speed) ----------
-TUNE_SEEDS   = [115, 119]     # 107 111
+
+TUNE_SEEDS   = [115, 119]     
 MAX_EPISODES = 5000           # per-seed episode budget per trial
 N_TRIALS     = 50
 
@@ -49,6 +49,6 @@ if __name__ == "__main__":
     print("score :", study.best_value)
     print("params:", study.best_params)
     print("metric2 (best trial):", study.best_trial.user_attrs)
-    with open("new_best_actor_critic_new.json", "w") as f:
+    with open("new_best_actor_critic.json", "w") as f:
         json.dump(study.best_params, f, indent=2)
     print("saved -> new_best_actor_critic.json")

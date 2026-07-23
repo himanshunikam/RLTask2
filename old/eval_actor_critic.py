@@ -7,7 +7,7 @@ after every seed, so partial progress survives interruption.
 """
 import json
 import numpy as np
-from stoch_actor_critic import train
+from actor_critic import train
 
 METHOD       = "Actor-Critic"
 CFG_PATH     = "new_best_actor_critic.json"
